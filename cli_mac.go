@@ -1,6 +1,5 @@
 package main 
 
-
 import "github.com/fatih/color"
 import "os"
 import "fmt"
@@ -9,9 +8,12 @@ import "github.com/skratchdot/open-golang/open"
 import "path/filepath"
 import "os"
 import "fmt"
+import "runtime"
 
-var PLATFORM int
-var USERNAME string
+//FOR MAC
+
+var USERNAME string = "NONE"
+
 
 func setup() {
 	"""Saves username and password"""
