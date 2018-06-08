@@ -48,8 +48,22 @@ func up_prompt() (string,string) {
 }
 
 
-func get_account_url(url string)  {
-	
+func get_account_url() string {
+
+	endpoint:=URL+"/account"
+	token:=authentication_handler(false)
+	val := "JWT " + token
+
+	header := req.Header{
+		"Content-Type":"application/json",
+		"Authorization": val,
+	}
+	r, err := req.Get(endpoint, header)
+	if err != nil {
+		fmt.Println("da")
+	}
+	c := r.String()
+	return c	
 }
 
 type User struct{
@@ -290,8 +304,8 @@ func main() {
 	// d,c:=retreive_secret("dsdsdsdsdsds")
 	// fmt.Println(d)
 	// fmt.Println(c)
-	authentication_handler(false)
-
+	// authentication_handler(false)
+	get_account_url()
 	// save_token(j)
 	// _, tt,_ := nativeStore.Get("bashlistcredentials")
 	// fmt.Println(secret)
