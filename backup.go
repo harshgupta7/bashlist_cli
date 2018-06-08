@@ -6,7 +6,9 @@ import "fmt"
 // import "github.com/skratchdot/open-golang/open"
 import "path/filepath"
 import "os"
+import "encoding/json"
 // import "runtime"
+
 import "bufio"
 import "github.com/howeyc/gopass"
 import "github.com/imroc/req"
@@ -43,6 +45,11 @@ func up_prompt() (string,string) {
 
 func get_account_url(url string)  {
 	
+}
+
+type User struct{
+	Email string
+	Password string
 }
 
 
@@ -192,11 +199,23 @@ func download_directory() {
 
 
 func get_token(u string, p string) (string,bool) {
+
+	b := User{
+		Email:"harsh",
+		Password:"Sairam",
+	}
+	mmd, _ := json.Marshal(b)
+	os.Stdout.Write(mmd)
 	
 	loc:="/bashlistauth"
 	endpoint:=URL+loc
-	s := []byte(fmt.Sprintf("{%s:%s,%s:%s}", `"email"`,"\""+u+"\"",`"password"`,"\""+p+"\""))
-	r, err := req.Post(endpoint, req.BodyJSON(s))
+	// email := `"`+u+`"`
+	// e_header:=`"`+"email"+`"`
+	// p_header:=`"`+"password"+`"`
+	// password:=`"`+p+`"`
+	// s := []byte(fmt.Sprintf("{%s:%s,%s:%s}", e_header,email,p_header,password))
+	// fmt.Println(string(s))
+	r, err := req.Post(endpoint, req.BodyJSON(mmd))
 	if err != nil {
 		return "SSD12",false
 	}
@@ -280,6 +299,22 @@ func main() {
 	// fmt.Println(secret)
 	// fmt.Println(tt)
 	// fmt.Println(username)
+
+
+
+	type UserAuth struct {
+		Email   string
+		Password string
+	}
+	group := UserAuth{
+		Email:   "Reds",
+		Password: "Crimson",
+	}
+	b, err := json.Marshal(group)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+	os.Stdout.Write(b)
 
 
 }
