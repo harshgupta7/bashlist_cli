@@ -24,18 +24,18 @@ var URL string = "http://127.0.0.1:5000"
 
 var nativeStore = osxkeychain.Osxkeychain{}
 
+type User struct{
+	Email string
+	Password string
+}
+
 func up_prompt() (string,string) {
 	//Ask for Username
 	color.Set(color.FgGreen)
 	fmt.Print(("Bashlist Email: "))
 	color.Unset() 
-	// reader := bufio.NewReader(os.Stdin)
-	// username, _ := reader.ReadString('\n')
-
-	// fmt.Print("Enter text: ")
     var input string
     fmt.Scanln(&input)
-    // fmt.Print(input)
 	
 	//Ask for Password
 	color.Set(color.FgGreen)
@@ -66,11 +66,6 @@ func get_account_url() string {
 	return c	
 }
 
-type User struct{
-	Email string
-	Password string
-}
-
 
 func incorrect_auth_loop() string {
 
@@ -78,8 +73,8 @@ func incorrect_auth_loop() string {
 		u1,p1 := up_prompt()
 		t1,s1 := get_token(u1,p1)
 		if s1==true{
-			save_secret("bashlistcredentials/pass",u1,p1)
-			save_secret("bashlistcredentials/token",u1,t1)
+			save_secret("Bashlist-Credentials/pass",u1,p1)
+			save_secret("Bashlist-Credentials/token",u1,t1)
 			return t1
 			break
 		}
@@ -107,14 +102,14 @@ func authentication_handler(exp bool) string{
 	if exp{
 
 		//get password from secure storage
-		u,p:=retreive_secret("bashlistcredentials/pass")
+		u,p:=retreive_secret("Bashlist-Credentials/pass")
 
 		//password has been set before:this is not the first time password is being fetched
 		if p!="X"{
 			token,success := get_token(u,p)
 			//Auth succeeded
 			if success{
-				save_secret("bashlistcredentials/token",u,token)
+				save_secret("Bashlist-Credentials/token",u,token)
 				return token
 			} else {
 			//Auth Failed
@@ -123,29 +118,26 @@ func authentication_handler(exp bool) string{
 			}
 		//Password isn't set. This should never happen, since method is asking token for the second time.
 		} else {
-
 			res := incorrect_auth_loop()
 			return res
 		}
 	//method is asking for the token the first time
 	} else {
 
-		u,t:=retreive_secret("bashlistcredentials/token")
+		u,t:=retreive_secret("Bashlist-Credentials/token")
 		//not the first time token will be called
 		if t!="X"{
 			return t
 
 		// token is not set
 		} else {
-
-			u1,p1 := retreive_secret("bashlistcredentials/pass")
-			
+			u1,p1 := retreive_secret("Bashlist-Credentials/pass")
 			//token is not set but password is set
 			if p1!="X" {
 				token,success := get_token(u1,p1)
 				//Auth succeeded
 				if success{
-					save_secret("bashlistcredentials/token",u,token)
+					save_secret("Bashlist-Credentials/token",u,token)
 					return token
 				} else {
 				//Auth Failed
@@ -199,17 +191,21 @@ func upload_directory() {
 	return
 }
 
-// func download_file(s string) {
-// 	// """Downloads a file"""
-// 	msg := "Fetching "+ s
-// 	r, err := req.Get(url)
-// 	if err != nil{
-// 		fmt.Println("Error downloading file. Please check your connection")
-// 	}
-// 	r.ToFile(s)
-// 	fmt.Println("Done.")
-// 	return
-// }
+func download_file(s string) {
+	// """Downloads a file"""
+
+	url:=URL+"/getfile"
+
+	msg := "Fetching "+ s
+	fmt.Println(msg)
+	r, err := req.Get(url)
+	if err != nil{
+		fmt.Println("Error downloading file. Please check your connection")
+	}
+	r.ToFile(s)
+	fmt.Println("Done.")
+	return
+}
 
 func download_directory() {
 	// """Downloads a directory"""
@@ -305,9 +301,10 @@ func main() {
 	// fmt.Println(d)
 	// fmt.Println(c)
 	// authentication_handler(false)
-	get_account_url()
+	c:=get_account_url()
+	fmt.Println(c)
 	// save_token(j)
-	// _, tt,_ := nativeStore.Get("bashlistcredentials")
+	// _, tt,_ := nativeStore.Get("Bashlist Credentials")
 	// fmt.Println(secret)
 	// fmt.Println(tt)
 	// fmt.Println(username)
