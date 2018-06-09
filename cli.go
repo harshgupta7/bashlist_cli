@@ -13,6 +13,7 @@ import "encoding/json"
 import "github.com/howeyc/gopass"
 import "github.com/imroc/req"
 // import "encoding/json"
+import "github.com/buger/jsonparser"
 
 import "github.com/docker/docker-credential-helpers/credentials"
 import "github.com/docker/docker-credential-helpers/osxkeychain"
@@ -160,8 +161,45 @@ func open_url(url string) {
 	return
 }
 
-func upload_file() {
+func upload_file(s string) {
 	// """Uploads a file"""
+	endpoint:=URL+"/filesync"
+	token:=authentication_handler(false)
+	val := "JWT " + token
+	header := req.Header{
+		"Content-Type":"application/json",
+		"Authorization": val,
+	}
+	file, _ := os.Open(s)
+	c,_:=req.Post(endpoint, req.FileUpload{
+		File:      file,
+		FieldName: "file",       
+		FileName:  s, 
+	},header)
+	byte_resp,_:=c.ToBytes()
+	response,_:=jsonparser.GetString(byte_resp, "BLCODE")
+	if response=="LMV23"{
+		fmt.Println("Successfully uploaded "+ s)
+		return
+	}
+	token=authentication_handler(true)
+	val = "JWT " + token
+	header = req.Header{
+		"Content-Type":"application/json",
+		"Authorization": val,
+	}
+	c,_=req.Post(endpoint, req.FileUpload{
+		File:      file,
+		FieldName: "file",       
+		FileName:  s, 
+	},header)
+	byte_resp,_=c.ToBytes()
+	response,_=jsonparser.GetString(byte_resp, "BLCODE")
+	if response=="LMV23"{
+		fmt.Println("Successfully uploaded "+ s)
+		return
+	}
+	fmt.Println("Error Uploading File")
 	return
 }
 
@@ -186,31 +224,41 @@ func objectExists(name string) bool {
     return true
 }
 
-func upload_directory() {
-	// """Uploads a directory"""
-	return
-}
+// func upload_directory() {
+// 	// """Uploads a directory"""
+// 	return
+// }
 
 func download_file(s string) {
 	// """Downloads a file"""
 
-	url:=URL+"/getfile"
-
-	msg := "Fetching "+ s
-	fmt.Println(msg)
-	r, err := req.Get(url)
-	if err != nil{
-		fmt.Println("Error downloading file. Please check your connection")
+	
+	endpoint:=URL+"/filedown/"+s
+	token:=authentication_handler(false)
+	val := "JWT " + token
+	header := req.Header{
+		"Content-Type":"application/json",
+		"Authorization": val,
 	}
+	r, _ := req.Get(endpoint,header)
 	r.ToFile(s)
-	fmt.Println("Done.")
 	return
 }
 
-func download_directory() {
-	// """Downloads a directory"""
-	return
-}
+// 	fmt.Println(msg)
+// 	r, err := req.Get(url)
+// 	if err != nil{
+// 		fmt.Println("Error downloading file. Please check your connection")
+// 	}
+// 	r.ToFile(s)
+// 	fmt.Println("Done.")
+// 	return
+// }
+
+// func download_directory() {
+// 	// """Downloads a directory"""
+// 	return
+// }
 
 
 func get_token(u string, p string) (string,bool) {
@@ -281,6 +329,20 @@ func show_help() {
 	// """ Shows the help page"""
 }
 
+func test_upload() {
+	endpoint:=URL+"/TestUpload"
+	// c,_:=req.Post(endpoint, req.File("cli_mac.go"))
+	// fmt.Println(c)
+
+	file, _ := os.Open("cli_mac.go")
+	c,_:=req.Post(endpoint, req.FileUpload{
+		File:      file,
+		FieldName: "file",       // FieldName is form field name
+		FileName:  "cli_mac.go", //Filename is the name of the file that you wish to upload. We use this to guess the mimetype as well as pass it onto the server
+	})
+	fmt.Println(c)
+}
+
 
 func main() {
 	// m,d:=up_prompt()
@@ -301,16 +363,18 @@ func main() {
 	// fmt.Println(d)
 	// fmt.Println(c)
 	// authentication_handler(false)
-	c:=get_account_url()
-	fmt.Println(c)
+	// c:=get_account_url()
+	// fmt.Println(c)
 	// save_token(j)
 	// _, tt,_ := nativeStore.Get("Bashlist Credentials")
 	// fmt.Println(secret)
 	// fmt.Println(tt)
 	// fmt.Println(username)
-
-
-
-
+	// t := upload_file("cli_mac.go")
+	// fmt.Println(t)
+	// test_upload()
+	// upload_file("ppr.go")
+	download_file("ppr.go")
+	// fmt.Println(c)
 
 }
