@@ -278,6 +278,59 @@ func get_current_dir() string{
 }
 
 
+type Mailer struct{
+	Recs string 
+	Filename string
+}
+
+func mail_file(r string,f string)string{
+
+	token := authentication_handler(false)
+	val:="JWT "+ token
+
+	b := Mailer{
+		Recs:r,
+		Filename:f,
+	}
+	mmd, _ := json.Marshal(b)
+
+	header := req.Header{
+		"Content-Type":"application/json",
+		"Authorization": val,
+	}
+	
+	loc:="/sendmail"
+	endpoint:=URL+loc
+
+	resp, err := req.Post(endpoint, req.BodyJSON(mmd),header)
+	if err != nil {
+		return "SSD12"
+	}
+	fmt.Println(resp)
+	return resp.String()
+
+	// var data map[string]interface{}
+	// err_ := r.ToJSON(&data)
+	// if err_ != nil {
+	// 	return "PRS23",false
+	// }
+	// if str, ok := data["BLCODE"].(string); ok {
+ //   		if str=="CTR23" {
+ //   			if tok,ok1 := data["access_token"].(string);ok1{
+ //   				return tok,true
+ //   			}else{
+ //   				return "JSE52",false
+ //   			}
+ //   		}
+ //   		return str,false
+ //   	}
+ //   	return "JSE54",false
+
+
+
+}
+
+
 func objectSize(path string) (int64, error) {
     var size int64
     err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
@@ -377,7 +430,7 @@ func get_token(u string, p string) (string,bool) {
 	var data map[string]interface{}
 	err_ := r.ToJSON(&data)
 	if err_ != nil {
-		fmt.Println("PRS23")
+		return "PRS23",false
 	}
 	if str, ok := data["BLCODE"].(string); ok {
    		if str=="CTR23" {
@@ -434,16 +487,12 @@ func lister(jsonBytes []byte)[][]string{
 
 	// Loop through the Items; we're not interested in the key, just the values
 	for _, v := range itemsMap {
-		// Use type assertions to ensure that the value's a JSON object
 		switch jsonObj := v.(type) {
-		// The value is an Item, represented as a generic interface
 		case interface{}:
 			var item Item
-			// Access the values in the JSON object and place them in an Item
 			for itemKey, itemValue := range jsonObj.(map[string]interface{}) {
 				switch itemKey {
 				case "Name":
-					// Make sure that Item1 is a string
 					switch itemValue := itemValue.(type) {
 					case string:
 						item.Name = itemValue
@@ -451,17 +500,14 @@ func lister(jsonBytes []byte)[][]string{
 						fmt.Println("Incorrect type for", itemKey)
 					}
 				case "Size":
-					// Make sure that Item2 is a number; all numbers are transformed to float64
 					switch itemValue := itemValue.(type) {
 					case float64:
 						item.Size = int(itemValue)
-						// fmt.Println(itemValue)
 					default:
 						fmt.Println("Incorrect type for", itemKey)
 					}
 
 				case "Updated_On":
-					// Make sure that Item2 is a number; all numbers are transformed to float64
 					switch itemValue := itemValue.(type) {
 					case string:
 						item.Updated_On = itemValue
@@ -469,7 +515,6 @@ func lister(jsonBytes []byte)[][]string{
 						fmt.Println("Incorrect type for", itemKey)
 					}
 				case "Description":
-					// Make sure that Item2 is a number; all numbers are transformed to float64
 					switch itemValue := itemValue.(type) {
 					case string:
 						item.Description = itemValue
@@ -495,9 +540,8 @@ func lister(jsonBytes []byte)[][]string{
 			}
 			t = append(t,fin)
 			t = append(t,item.Updated_On)
-			t =append(t,item.Description)
-			// t = {item.Name,string(item.Size),item.Updated_On,item.Description}
-			// fmt.Println(item)
+			t = append(t,item.Description)
+		
 			retarr = append(retarr,t)
 		// Not a JSON object; handle the error
 		default:
@@ -555,7 +599,6 @@ func get_storage_list() {
 	table.AppendBulk(data) // Add Bulk Data
 	table.Render()
 
-
 }
 
 
@@ -565,7 +608,9 @@ func show_help() {
 
 
 func main() {
-	get_storage_list()
-	// upload_file("j.txt")
+	// get_storage_list()
+	// c:=mail_file("cli_mac.go","harsh@codeclimate.com")
+	// fmt.Println(c)
+	upload_file("sad.txt")
 
 }
