@@ -7,12 +7,8 @@ import "fmt"
 import "path/filepath"
 import "os"
 import "encoding/json"
-// import "runtime"
-
-// import "bufio"
 import "github.com/howeyc/gopass"
 import "github.com/imroc/req"
-// import "encoding/json"
 import "github.com/buger/jsonparser"
 
 import "github.com/docker/docker-credential-helpers/credentials"
@@ -157,8 +153,9 @@ func authentication_handler(exp bool) string{
 }
 
 func open_url(url string) {
-	// """Gets account URL and opens it in browser"""
-	return
+	// opens url in browser
+	_:=open.Run(url)
+
 }
 
 func upload_file(s string) {
@@ -269,8 +266,37 @@ func download_file(s string) {
 		fmt.Println("Error Connecting. Please check your connection and try again")
 		return
 	}
-	r.ToFile(s)
-	return
+
+	byte_resp,_:=r.ToBytes()
+	response,JSONerr:=jsonparser.GetString(byte_resp, "BLCODE")
+	if JSONerr!=nil{
+		r.ToFile(s)
+		return
+	}else if response=="NE235"{
+		fmt.Println(s+": No such file exists in your Bashlist.")
+		return
+	}else if response=="INC23"{
+		token=authentication_handler(true)
+		val = "JWT " + token
+		header = req.Header{
+			"Content-Type":"application/json",
+			"Authorization": val,
+		}
+		r, conn_error = req.Get(endpoint,header)
+		if conn_error!=nil{
+			fmt.Println("Error Connecting. Please check your connection and try again")
+			return
+		}
+		byte_resp,_:=r.ToBytes()
+		_,JSONerr:=jsonparser.GetString(byte_resp, "BLCODE")
+		if JSONerr!=nil{
+			r.ToFile(s)
+			return
+		}else{
+			fmt.Println("Error downloading file.")
+			return
+		}
+	}
 }
 
 
@@ -372,8 +398,8 @@ func main() {
 	// t := upload_file("cli_mac.go")
 	// fmt.Println(t)
 	// test_upload()
-	// upload_file("ppr.go")
-	download_file("ppr.go")
+	// upload_file("asasdad.go")
+	// download_file("pdasaspr.go")
 	// current_dir := get_current_dir()
 	// file_path := current_dir+"/"+"ppr.go"
 	// deleteFile(file_path)
