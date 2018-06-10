@@ -3,18 +3,18 @@ package main
 import "github.com/fatih/color"
 import "fmt"
 // import "io/ioutil"
-// import "github.com/skratchdot/open-golang/open"
+import "github.com/skratchdot/open-golang/open"
 import "path/filepath"
 import "os"
 import "encoding/json"
 import "github.com/howeyc/gopass"
 import "github.com/imroc/req"
 import "github.com/buger/jsonparser"
-
+// "encoding/json"
 import "github.com/docker/docker-credential-helpers/credentials"
 import "github.com/docker/docker-credential-helpers/osxkeychain"
-
-
+import "github.com/olekukonko/tablewriter"
+import "strconv"
 //FOR MAC
 
 var URL string = "http://127.0.0.1:5000"
@@ -57,10 +57,43 @@ func get_account_url() string {
 	}
 	r, err := req.Get(endpoint, header)
 	if err != nil {
-		fmt.Println("da")
+		fmt.Println("Error Connecting. Please check your internet connection.")
+		return "ERR"
 	}
-	c := r.String()
-	return c	
+
+	byte_resp,_:=r.ToBytes()
+	response,err :=jsonparser.GetString(byte_resp,"URL")
+	if err==nil{
+		return response
+	}
+
+	response1,err1:=jsonparser.GetString(byte_resp, "BLCODE")
+	if err1==nil{
+		if response1=="INC23"{
+
+			token=authentication_handler(true)
+			val = "JWT " + token
+
+			header = req.Header{
+				"Content-Type":"application/json",
+				"Authorization": val,
+			}
+			r, err = req.Get(endpoint, header)
+			if err != nil {
+				fmt.Println("Error Connecting. Please check your internet connection.")
+				return "ERR"
+			}
+
+			byte_resp,_:=r.ToBytes()
+			response,err :=jsonparser.GetString(byte_resp,"URL")
+			if err==nil{
+				return response
+			}
+
+		}
+	}
+	return "Error Retreiving Account URL"
+
 }
 
 
@@ -154,7 +187,7 @@ func authentication_handler(exp bool) string{
 
 func open_url(url string) {
 	// opens url in browser
-	_:=open.Run(url)
+	open.Run(url)
 
 }
 
@@ -352,11 +385,128 @@ func retreive_secret(url string)(string,string) {
 	}
 	return username,tok
 }	
+type Item struct {
+	Name string
+	Size int
+	Updated_On string 
+	Description string
+}
 
+func (i Item) String() string {
+	return fmt.Sprintf("Item: %s, %d", i.Name, i.Size)
+}
+
+func lister(jsonBytes []byte)[][]string{
+	var f interface{}
+	err := json.Unmarshal(jsonBytes, &f)
+	if err != nil {
+		fmt.Println("Error parsing JSON: ", err)
+	}
+	var retarr [][]string
+	// JSON object parses into a map with string keys
+	itemsMap := f.(map[string]interface{})
+
+	// Loop through the Items; we're not interested in the key, just the values
+	for _, v := range itemsMap {
+		// Use type assertions to ensure that the value's a JSON object
+		switch jsonObj := v.(type) {
+		// The value is an Item, represented as a generic interface
+		case interface{}:
+			var item Item
+			// Access the values in the JSON object and place them in an Item
+			for itemKey, itemValue := range jsonObj.(map[string]interface{}) {
+				switch itemKey {
+				case "Name":
+					// Make sure that Item1 is a string
+					switch itemValue := itemValue.(type) {
+					case string:
+						item.Name = itemValue
+					default:
+						fmt.Println("Incorrect type for", itemKey)
+					}
+				case "Size":
+					// Make sure that Item2 is a number; all numbers are transformed to float64
+					switch itemValue := itemValue.(type) {
+					case float64:
+						item.Size = int(itemValue)
+						// fmt.Println(itemValue)
+					default:
+						fmt.Println("Incorrect type for", itemKey)
+					}
+
+				case "Updated_On":
+					// Make sure that Item2 is a number; all numbers are transformed to float64
+					switch itemValue := itemValue.(type) {
+					case string:
+						item.Updated_On = itemValue
+					default:
+						fmt.Println("Incorrect type for", itemKey)
+					}
+				case "Description":
+					// Make sure that Item2 is a number; all numbers are transformed to float64
+					switch itemValue := itemValue.(type) {
+					case string:
+						item.Description = itemValue
+					default:
+						fmt.Println("Incorrect type for", itemKey)
+					}
+
+				default:
+					fmt.Println("Unknown key for Item found in JSON")
+				}
+			}
+			var t []string
+			var fin string
+			t = append(t, item.Name)
+			display_val := int(item.Size/(1000*1000))
+			if display_val < 1{
+				display_val = int(item.Size/1000)
+				fin =strconv.Itoa(display_val)
+				fin = fin+" KB"
+			}else{
+				fin:=strconv.Itoa(display_val)
+				fin = fin+" MB"
+			}
+			t = append(t,fin)
+			t = append(t,item.Updated_On)
+			t =append(t,item.Description)
+			// t = {item.Name,string(item.Size),item.Updated_On,item.Description}
+			// fmt.Println(item)
+			retarr = append(retarr,t)
+		// Not a JSON object; handle the error
+		default:
+			fmt.Println("Expecting a JSON object; got something else")
+		}
+	}
+	return retarr
+
+}
 
 func get_storage_list() {
-	// """ Gets a list of stored objects for the user"""
-	return
+	endpoint:=URL+"/getallfiles"
+	token:=authentication_handler(false)
+	val := "JWT " + token
+
+	header := req.Header{
+		"Content-Type":"application/json",
+		"Authorization": val,
+	}
+	r, err := req.Get(endpoint, header)
+	if err != nil {
+		fmt.Println("Error Connecting. Please check your internet connection.")
+		return
+	}
+	byteVal,_ := r.ToBytes()
+	data:=lister(byteVal)
+
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"Name", "Size", "Last Updated", "Description"})
+	table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+	table.SetCenterSeparator("")
+	table.AppendBulk(data) // Add Bulk Data
+	table.Render()
+
+
 }
 
 func display_files(){
@@ -398,7 +548,7 @@ func main() {
 	// t := upload_file("cli_mac.go")
 	// fmt.Println(t)
 	// test_upload()
-	// upload_file("asasdad.go")
+	// upload_file("testyic.txt")
 	// download_file("pdasaspr.go")
 	// current_dir := get_current_dir()
 	// file_path := current_dir+"/"+"ppr.go"
@@ -406,4 +556,20 @@ func main() {
 	// fmt.Println(c)
 	// m:=get_current_dir()
 	// fmt.Println(m)
+
+	// data := [][]string{
+	// 	[]string{"1/1/2014", "Domain name", "2233", "$10.98"},
+	// 	[]string{"1/1/2014", "January Hosting", "2233", "$54.95"},
+	// 	[]string{"1/4/2014", "February Hosting", "2233", "$51.00"},
+	// 	[]string{"1/4/2014", "February Extra Bandwidth", "2233", "$30.00"},
+	// }
+
+	// table := tablewriter.NewWriter(os.Stdout)
+	// table.SetHeader([]string{"Date", "Description", "CV2", "Amount"})
+	// table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+	// table.SetCenterSeparator("")
+	// table.AppendBulk(data) // Add Bulk Data
+	// table.Render()
+	get_storage_list()
+
 }
