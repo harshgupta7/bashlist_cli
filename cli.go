@@ -1,19 +1,19 @@
 package main 
 
-import "github.com/fatih/color"
-import "fmt"
-import "github.com/skratchdot/open-golang/open"
-import "path/filepath"
-import "os"
+import "bufio"
 import "encoding/json"
-import "github.com/howeyc/gopass"
-import "github.com/imroc/req"
+import "fmt"
 import "github.com/buger/jsonparser"
 import "github.com/docker/docker-credential-helpers/credentials"
 import "github.com/docker/docker-credential-helpers/osxkeychain"
+import "github.com/fatih/color"
+import "github.com/howeyc/gopass"
+import "github.com/imroc/req"
 import "github.com/olekukonko/tablewriter"
+import "github.com/skratchdot/open-golang/open"
+import "path/filepath"
+import "os"
 import "strconv"
-import "bufio"
 
 
 
@@ -28,6 +28,10 @@ type User struct{
 }
 
 func up_prompt() (string,string) {
+
+	/* Displays prompt to ask for username, password. 
+	Returns Strings */
+
 	//Ask for Username
 	color.Set(color.FgGreen)
 	fmt.Print(("Bashlist Email: "))
@@ -51,14 +55,17 @@ func up_prompt() (string,string) {
 
 func get_account_url() string {
 
-	endpoint:=URL+"/account"
-	token:=authentication_handler(false)
+	/* Gets Personal Account URL */
+
+	var endpoint string = URL+"/account"
+	var token string = authentication_handler(false)
 	val := "JWT " + token
 
 	header := req.Header{
 		"Content-Type":"application/json",
 		"Authorization": val,
 	}
+
 	r, err := req.Get(endpoint, header)
 	if err != nil {
 		fmt.Println("Error Connecting. Please check your internet connection.")
@@ -74,7 +81,6 @@ func get_account_url() string {
 	response1,err1:=jsonparser.GetString(byte_resp, "BLCODE")
 	if err1==nil{
 		if response1=="INC23"{
-
 			token=authentication_handler(true)
 			val = "JWT " + token
 
@@ -102,6 +108,8 @@ func get_account_url() string {
 
 
 func incorrect_auth_loop() string {
+
+	/* Keeps asking for username and password until correct combination is entered*/
 
 	for {
 		u1,p1 := up_prompt()
@@ -131,6 +139,10 @@ func incorrect_auth_loop() string {
 
 
 func authentication_handler(exp bool) string{
+
+	/* This is the method that each method will call.
+	Handles retreiving token, and if token is expired, fetching a new one*/
+
 
 	//token has expired, method is asking for a fresh token
 	if exp{
@@ -190,6 +202,9 @@ func authentication_handler(exp bool) string{
 }
 
 func open_url(url string) {
+
+	/* Opens a url in browser*/
+
 	// opens url in browser
 	open.Run(url)
 
@@ -197,6 +212,9 @@ func open_url(url string) {
 
 
 func upload_file(s string) {
+
+	/* Uploads a file to the URL*/
+
 	// """Uploads a file"""
 
 	token:=authentication_handler(false)
@@ -209,8 +227,7 @@ func upload_file(s string) {
 	}
 
 	fmt.Print("Description (Press Enter to Leave Blank): ")
-	// var desc string
- //    fmt.Scanln(&desc)
+
 	var desc string
   	scanner := bufio.NewScanner(os.Stdin)
   	for scanner.Scan() {
@@ -273,6 +290,9 @@ func upload_file(s string) {
 }
 
 func get_current_dir() string{
+
+	/* Gets current directory*/
+
     dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
     return dir
 }
@@ -284,6 +304,7 @@ type Mailer struct{
 }
 
 func mail_file(r string,f string)string{
+	/* Mails a file in users bashlist storage*/
 
 	token := authentication_handler(false)
 	val:="JWT "+ token
@@ -309,29 +330,13 @@ func mail_file(r string,f string)string{
 	fmt.Println(resp)
 	return resp.String()
 
-	// var data map[string]interface{}
-	// err_ := r.ToJSON(&data)
-	// if err_ != nil {
-	// 	return "PRS23",false
-	// }
-	// if str, ok := data["BLCODE"].(string); ok {
- //   		if str=="CTR23" {
- //   			if tok,ok1 := data["access_token"].(string);ok1{
- //   				return tok,true
- //   			}else{
- //   				return "JSE52",false
- //   			}
- //   		}
- //   		return str,false
- //   	}
- //   	return "JSE54",false
-
-
-
 }
 
 
 func objectSize(path string) (int64, error) {
+
+	/* Gets the size of a file or directory*/
+
     var size int64
     err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
         if !info.IsDir() {
@@ -343,6 +348,9 @@ func objectSize(path string) (int64, error) {
 }
 
 func objectExists(name string) bool {
+
+	/* Checks whether a file or directory with name exists or not.*/
+
     if _, err := os.Stat(name); err != nil {
     if os.IsNotExist(err) {
             return false
@@ -353,6 +361,9 @@ func objectExists(name string) bool {
 
 
 func download_file(s string) {
+
+	/* Downloads a file from users bashlist*/
+
 	// """Downloads a file"""
 	token:=authentication_handler(false)
 	current_dir := get_current_dir()
@@ -414,6 +425,8 @@ func download_file(s string) {
 
 func get_token(u string, p string) (string,bool) {
 
+	/* Gets a token from the server*/
+
 	b := User{
 		Email:u,
 		Password:p,
@@ -449,6 +462,9 @@ func get_token(u string, p string) (string,bool) {
 
 
 func save_secret(url string, u string, t string) {
+
+	/* Saves secret in users credential manager*/
+
 	c := &credentials.Credentials{
 	    ServerURL: url,
 	    Username: u,
@@ -458,12 +474,17 @@ func save_secret(url string, u string, t string) {
 }
 
 func retreive_secret(url string)(string,string) {
+
+	/* Retreives secret from users credentials manager*/
+
 	username, tok,err := nativeStore.Get(url)
 	if err!=nil {
 		return "MMW43","X"
 	}
 	return username,tok
 }	
+
+
 type Item struct {
 	Name string
 	Size int
@@ -471,11 +492,11 @@ type Item struct {
 	Description string
 }
 
-func (i Item) String() string {
-	return fmt.Sprintf("Item: %s, %d", i.Name, i.Size)
-}
 
 func lister(jsonBytes []byte)[][]string{
+
+	/* Method to parse JSON and return it as a matrix of string*/
+
 	var f interface{}
 	err := json.Unmarshal(jsonBytes, &f)
 	if err != nil {
@@ -553,6 +574,9 @@ func lister(jsonBytes []byte)[][]string{
 }
 
 func get_storage_list() {
+
+	/* Displays the list of items in user's bashlist*/
+
 	endpoint:=URL+"/getallfiles"
 	token:=authentication_handler(false)
 	val := "JWT " + token
@@ -608,9 +632,6 @@ func show_help() {
 
 
 func main() {
-	// get_storage_list()
-	// c:=mail_file("cli_mac.go","harsh@codeclimate.com")
-	// fmt.Println(c)
-	upload_file("sad.txt")
+	return
 
 }
