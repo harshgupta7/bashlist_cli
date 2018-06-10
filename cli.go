@@ -13,9 +13,10 @@ import "github.com/docker/docker-credential-helpers/credentials"
 import "github.com/docker/docker-credential-helpers/osxkeychain"
 import "github.com/olekukonko/tablewriter"
 import "strconv"
+import "bufio"
 
 
-//FOR MAC
+
 
 var URL string = "http://127.0.0.1:5000"
 
@@ -191,8 +192,12 @@ func open_url(url string) {
 
 }
 
+
 func upload_file(s string) {
 	// """Uploads a file"""
+
+	token:=authentication_handler(false)
+
 	current_dir := get_current_dir()
 	file_path := current_dir+"/"+s
 	if objectExists(file_path) == false{
@@ -200,12 +205,23 @@ func upload_file(s string) {
 		return
 	}
 
+	fmt.Print("Description (Press Enter to Leave Blank): ")
+	// var desc string
+ //    fmt.Scanln(&desc)
+	var desc string
+  	scanner := bufio.NewScanner(os.Stdin)
+  	for scanner.Scan() {
+  	    desc = scanner.Text()
+  	    break
+  	}
+
+
 	endpoint:=URL+"/filesync"
-	token:=authentication_handler(false)
 	val := "JWT " + token
 	header := req.Header{
 		"Content-Type":"application/json",
 		"Authorization": val,
+		"Description":desc,
 	}
 	file, _ := os.Open(s)
 	c,err_conn:=req.Post(endpoint, req.FileUpload{
@@ -220,8 +236,12 @@ func upload_file(s string) {
 	byte_resp,_:=c.ToBytes()
 	
 	response,_:=jsonparser.GetString(byte_resp, "BLCODE")
+
 	if response=="LMV23"{
 		fmt.Println("Successfully uploaded "+ s)
+		return
+	}else if response=="OVX23"{
+		fmt.Println("Not Enough Space to Upload File.")
 		return
 	}
 	token=authentication_handler(true)
@@ -240,7 +260,11 @@ func upload_file(s string) {
 	if response=="LMV23"{
 		fmt.Println("Successfully uploaded "+ s)
 		return
+	}else if response=="OVX23"{
+		fmt.Println("Not Enough Space to Upload File.")
+		return
 	}
+
 	fmt.Println("Error Uploading File")
 	return
 }
@@ -274,7 +298,7 @@ func objectExists(name string) bool {
 
 func download_file(s string) {
 	// """Downloads a file"""
-
+	token:=authentication_handler(false)
 	current_dir := get_current_dir()
 	file_path := current_dir+"/"+s 
 	ex:=objectExists(file_path)
@@ -288,7 +312,6 @@ func download_file(s string) {
 	}
 
 	endpoint:=URL+"/filedown/"+s
-	token:=authentication_handler(false)
 	val := "JWT " + token
 	header := req.Header{
 		"Content-Type":"application/json",
@@ -522,7 +545,6 @@ func get_storage_list() {
 	}
 
 	data:=lister(byteVal)
-
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Name", "Size", "Last Updated", "Description"})
 	table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
@@ -533,10 +555,6 @@ func get_storage_list() {
 
 }
 
-func display_files(){
-	// """ Displays list of objects for the user in a pretty format"""
-	return
-}
 
 func show_help() {
 	// """ Shows the help page"""
@@ -545,5 +563,6 @@ func show_help() {
 
 func main() {
 	get_storage_list()
+	// upload_file("j.txt")
 
 }
