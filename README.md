@@ -8,6 +8,11 @@ CLI Package for Bashlist.
 * Build Using `go build cli-mac.go`--This will create an executable binary.
 * Run `./cli-mac`
 
+# docs/
+* Contains CLI docs for customers
+* run `npm i docsify-cli -g` to install docsify
+* run `docsify serve ./docs` -- This will start a local server
+* open `localhost:3000` to see full CLI documentation.
 
 ## Dependencies
 
