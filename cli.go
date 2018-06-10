@@ -163,6 +163,13 @@ func open_url(url string) {
 
 func upload_file(s string) {
 	// """Uploads a file"""
+	current_dir := get_current_dir()
+	file_path := current_dir+"/"+s
+	if objectExists(file_path) == false{
+		fmt.Println(s+": No such file or directory")
+		return
+	}
+
 	endpoint:=URL+"/filesync"
 	token:=authentication_handler(false)
 	val := "JWT " + token
@@ -171,12 +178,17 @@ func upload_file(s string) {
 		"Authorization": val,
 	}
 	file, _ := os.Open(s)
-	c,_:=req.Post(endpoint, req.FileUpload{
+	c,err_conn:=req.Post(endpoint, req.FileUpload{
 		File:      file,
 		FieldName: "file",       
 		FileName:  s, 
 	},header)
+	if err_conn!=nil{
+		fmt.Println("Error Connecting. Please Check Your Connection & Try Again.")
+		return
+	}
 	byte_resp,_:=c.ToBytes()
+	
 	response,_:=jsonparser.GetString(byte_resp, "BLCODE")
 	if response=="LMV23"{
 		fmt.Println("Successfully uploaded "+ s)
@@ -203,6 +215,11 @@ func upload_file(s string) {
 	return
 }
 
+func get_current_dir() string{
+    dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+    return dir
+}
+
 
 func objectSize(path string) (int64, error) {
     var size int64
@@ -224,15 +241,22 @@ func objectExists(name string) bool {
     return true
 }
 
-// func upload_directory() {
-// 	// """Uploads a directory"""
-// 	return
-// }
 
 func download_file(s string) {
 	// """Downloads a file"""
 
-	
+	current_dir := get_current_dir()
+	file_path := current_dir+"/"+s 
+	ex:=objectExists(file_path)
+	if ex==true{
+		fmt.Print(s+" already Exists. Do you want to continue?[Y/n]")
+		var response string
+    	fmt.Scanln(&response)
+    	if response=="n"||response=="N"||response=="No"||response=="no"{
+    		return
+    	}
+	}
+
 	endpoint:=URL+"/filedown/"+s
 	token:=authentication_handler(false)
 	val := "JWT " + token
@@ -240,25 +264,14 @@ func download_file(s string) {
 		"Content-Type":"application/json",
 		"Authorization": val,
 	}
-	r, _ := req.Get(endpoint,header)
+	r, conn_error := req.Get(endpoint,header)
+	if conn_error!=nil{
+		fmt.Println("Error Connecting. Please check your connection and try again")
+		return
+	}
 	r.ToFile(s)
 	return
 }
-
-// 	fmt.Println(msg)
-// 	r, err := req.Get(url)
-// 	if err != nil{
-// 		fmt.Println("Error downloading file. Please check your connection")
-// 	}
-// 	r.ToFile(s)
-// 	fmt.Println("Done.")
-// 	return
-// }
-
-// func download_directory() {
-// 	// """Downloads a directory"""
-// 	return
-// }
 
 
 func get_token(u string, p string) (string,bool) {
@@ -329,20 +342,6 @@ func show_help() {
 	// """ Shows the help page"""
 }
 
-func test_upload() {
-	endpoint:=URL+"/TestUpload"
-	// c,_:=req.Post(endpoint, req.File("cli_mac.go"))
-	// fmt.Println(c)
-
-	file, _ := os.Open("cli_mac.go")
-	c,_:=req.Post(endpoint, req.FileUpload{
-		File:      file,
-		FieldName: "file",       // FieldName is form field name
-		FileName:  "cli_mac.go", //Filename is the name of the file that you wish to upload. We use this to guess the mimetype as well as pass it onto the server
-	})
-	fmt.Println(c)
-}
-
 
 func main() {
 	// m,d:=up_prompt()
@@ -375,6 +374,10 @@ func main() {
 	// test_upload()
 	// upload_file("ppr.go")
 	download_file("ppr.go")
+	// current_dir := get_current_dir()
+	// file_path := current_dir+"/"+"ppr.go"
+	// deleteFile(file_path)
 	// fmt.Println(c)
-
+	// m:=get_current_dir()
+	// fmt.Println(m)
 }
