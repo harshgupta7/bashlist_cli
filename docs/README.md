@@ -5,6 +5,7 @@
 ## Available Commands
 
 * `bls` -- Lists all files and directories in user's bashlist storage.
+* `bls account` -- Opens users account page in browser
 * `bls push <filename>` -- uploads file to user's bashlist
 * `bls pull <filename or unique_file_token>` -- downloads file from user's bashlist
 * `bls del <filename>` -- deletes a file from user's bashlist
