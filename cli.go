@@ -2,7 +2,6 @@ package main
 
 import "github.com/fatih/color"
 import "fmt"
-// import "io/ioutil"
 import "github.com/skratchdot/open-golang/open"
 import "path/filepath"
 import "os"
@@ -10,11 +9,12 @@ import "encoding/json"
 import "github.com/howeyc/gopass"
 import "github.com/imroc/req"
 import "github.com/buger/jsonparser"
-// "encoding/json"
 import "github.com/docker/docker-credential-helpers/credentials"
 import "github.com/docker/docker-credential-helpers/osxkeychain"
 import "github.com/olekukonko/tablewriter"
 import "strconv"
+
+
 //FOR MAC
 
 var URL string = "http://127.0.0.1:5000"
@@ -497,6 +497,30 @@ func get_storage_list() {
 		return
 	}
 	byteVal,_ := r.ToBytes()
+
+	response,err :=jsonparser.GetString(byteVal,"BLCODE")
+	if err==nil{
+		if response=="INC23"{
+			token:=authentication_handler(true)
+			val = "JWT " + token
+			header = req.Header{
+				"Content-Type":"application/json",
+				"Authorization": val,
+			}
+
+			r, err = req.Get(endpoint, header)
+			if err != nil {
+				fmt.Println("Error Connecting. Please check your internet connection.")
+				return
+			}
+			byteVal,_ = r.ToBytes()
+
+		}else{
+			fmt.Println("Error Connecting. Please check your internet connection.")
+			return
+		}
+	}
+
 	data:=lister(byteVal)
 
 	table := tablewriter.NewWriter(os.Stdout)
@@ -520,56 +544,6 @@ func show_help() {
 
 
 func main() {
-	// m,d:=up_prompt()
-	// l,_:=get_token(m,d)
-	// fmt.Println(l)
-	// z,_:=get_token(m,d)
-	// fmt.Println(z)
-	// setup()
-	// s:="harsh"
-	// p:="Sairam"
-	// j:=get_token(s,p)
-	// fmt.Println(j)
-	// fmt.Println(USERNAME)
-	// USERNAME = "ddr"
-	// fmt.Println(USERNAME)
-	// save_secret("dsdsdsdsdsds","harsh","Sairam")
-	// d,c:=retreive_secret("dsdsdsdsdsds")
-	// fmt.Println(d)
-	// fmt.Println(c)
-	// authentication_handler(false)
-	// c:=get_account_url()
-	// fmt.Println(c)
-	// save_token(j)
-	// _, tt,_ := nativeStore.Get("Bashlist Credentials")
-	// fmt.Println(secret)
-	// fmt.Println(tt)
-	// fmt.Println(username)
-	// t := upload_file("cli_mac.go")
-	// fmt.Println(t)
-	// test_upload()
-	// upload_file("testyic.txt")
-	// download_file("pdasaspr.go")
-	// current_dir := get_current_dir()
-	// file_path := current_dir+"/"+"ppr.go"
-	// deleteFile(file_path)
-	// fmt.Println(c)
-	// m:=get_current_dir()
-	// fmt.Println(m)
-
-	// data := [][]string{
-	// 	[]string{"1/1/2014", "Domain name", "2233", "$10.98"},
-	// 	[]string{"1/1/2014", "January Hosting", "2233", "$54.95"},
-	// 	[]string{"1/4/2014", "February Hosting", "2233", "$51.00"},
-	// 	[]string{"1/4/2014", "February Extra Bandwidth", "2233", "$30.00"},
-	// }
-
-	// table := tablewriter.NewWriter(os.Stdout)
-	// table.SetHeader([]string{"Date", "Description", "CV2", "Amount"})
-	// table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
-	// table.SetCenterSeparator("")
-	// table.AppendBulk(data) // Add Bulk Data
-	// table.Render()
 	get_storage_list()
 
 }
