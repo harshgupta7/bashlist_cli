@@ -32,16 +32,19 @@ func up_prompt() (string,string) {
 	color.Set(color.FgGreen)
 	fmt.Print(("Bashlist Email: "))
 	color.Unset() 
-    var input string
-    fmt.Scanln(&input)
-	
+	var desc string
+    scanner := bufio.NewScanner(os.Stdin)
+  	for scanner.Scan() {
+  	    desc = scanner.Text()
+  	    break
+  	}
 	//Ask for Password
 	color.Set(color.FgGreen)
 	fmt.Print(("Bashlist Password: "))
 	color.Unset() 
 	pass, _ := gopass.GetPasswd()
 	string_pass := string(pass)
-	return input,string_pass
+	return desc,string_pass
 
 }
 
