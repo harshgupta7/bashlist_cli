@@ -6,7 +6,7 @@ CLI Package for Bashlist.
 * Install go
 * Install external dependencies using `go get <dependency-name>`.
 * Build Using `go build cli-mac.go`--This will create an executable binary.
-* Run `/cli-mac`
+* Run `./cli-mac`
 
 
 ## Dependencies
