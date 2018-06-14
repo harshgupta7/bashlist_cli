@@ -1,11 +1,13 @@
 package main
 
+import "os"
+import "fmt"
 import "github.com/fatih/color"
 import "github.com/howeyc/gopass"
 import "github.com/docker/docker-credential-helpers/credentials"
 import "github.com/docker/docker-credential-helpers/osxkeychain"
 
-
+var nativeStore = osxkeychain.Osxkeychain{}
 
 
 func get_username_password()(*string,*string){
@@ -46,7 +48,8 @@ func retreive_secret(url string)(*string,*string) {
 
 	username, tok,err := nativeStore.Get(url)
 	if err!=nil {
-		return "MMW43","X"
+		fmt.Println("An error occured while retreiving your credentials.Please try again later.")
+		os.Exit(1)
 	}
 	return &username,&tok
 }	
