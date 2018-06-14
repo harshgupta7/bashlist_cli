@@ -16,7 +16,7 @@ func object_exists(path string) (bool, error) {
 }
 
 func IsDirectory(path string) (bool, error) {
-	
+
 	/* Checks whether a object is directory or a file*/
     fileInfo, err := os.Stat(path)
     return fileInfo.IsDir(), err
@@ -25,7 +25,10 @@ func IsDirectory(path string) (bool, error) {
 
 func bucket_exists(dirname string)(bool){
 	/*Checks whether a directory exists in the cwd or not*/
-	exists,err:=object_exists(dirname)
+	cwd_address := get_cwd()
+	cwd := *cwd_address
+	path := cwd+'/'+dirname
+	exists,err:=object_exists(path)
 	if err!=nil{
 		fmt.Println("An Unexpected Error Occurred.Please Try Again Later")
 		os.Exit(1)
@@ -34,7 +37,7 @@ func bucket_exists(dirname string)(bool){
 		fmt.Println(dirname+": No such file or directory")
 		return false
 	}
-	isDir,dirErr := IsDirectory(dirname)
+	isDir,dirErr := IsDirectory(path)
 	if dirErr!=nil{
 		fmt.Println("An Unexpected Error Occurred.Please Try Again Later")
 		os.Exit(1)
