@@ -5,5 +5,5 @@ func share_repo_token(){
 }
 
 func share_repo_link(){
-	/* Generates a link to 
+	/* Generates a link to */
 }
