@@ -90,7 +90,7 @@ func encrypt_with_pubkey(msg []byte,priv_key *rsa.PrivateKey,rec_key *rsa.Public
 	return &ciphertext,&signature,nil
 }
 
-func decrypt_with_privkey(priv_key *rsa.PrivateKey, sender_pubkey *rsa.PublicKey, ciphertext *[]byte)(*[]byte,error){
+func decrypt_with_privkey(priv_key *rsa.PrivateKey,ciphertext *[]byte)(*[]byte,error){
 	//Decrypt Ciphertext
 	hash := sha256.New()
 	label := []byte("")
