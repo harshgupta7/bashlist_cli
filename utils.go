@@ -1,9 +1,12 @@
 package main 
 
 import "bytes"
+import "crypto"
 import "crypto/aes"
 import "crypto/cipher"
 import "crypto/rand"
+import "crypto/rsa"
+import "crypto/sha256"
 import "errors"
 import "fmt"
 import "github.com/pierrre/archivefile/zip"
@@ -35,7 +38,7 @@ func bucket_exists(dirname string)(bool){
 	/*Checks whether a directory exists in the cwd or not*/
 	cwd_address := get_cwd()
 	cwd := *cwd_address
-	path := cwd+'/'+dirname
+	path := cwd+"/"+dirname
 	exists,err:=object_exists(path)
 	if err!=nil{
 		fmt.Println("An Unexpected Error Occurred.Please Try Again Later")
@@ -56,6 +59,53 @@ func bucket_exists(dirname string)(bool){
 	}
 	return true
 }
+
+func generate_key_pair()(*rsa.PrivateKey,*rsa.PublicKey,error){
+	privkey, err := rsa.GenerateKey(rand.Reader, 1024)
+	if err!=nil{
+		return nil,nil,err
+	}
+	pubkey := &privkey.PublicKey
+	return privkey,pubkey,err
+}
+
+func encrypt_with_pubkey(msg []byte,priv_key *rsa.PrivateKey,rec_key *rsa.PublicKey)(*[]byte,*[]byte,error){
+    label := []byte("")
+	hash := sha256.New()
+	ciphertext, err := rsa.EncryptOAEP(hash, rand.Reader, rec_key, msg, label)
+	if err!=nil{
+		return nil,nil,err
+	}
+	var opts rsa.PSSOptions
+	opts.SaltLength = rsa.PSSSaltLengthAuto
+	PSSmessage := msg
+	newhash := crypto.SHA256
+	pssh := newhash.New()
+	pssh.Write(PSSmessage)
+	hashed := pssh.Sum(nil)
+	signature, sign_err := rsa.SignPSS(rand.Reader, priv_key, newhash, hashed, &opts)
+	if sign_err!=nil{
+		return nil,nil,sign_err
+	} 
+	return &ciphertext,&signature,nil
+}
+
+func decrypt_with_privkey(priv_key *rsa.PrivateKey,ciphertext *[]byte)(*[]byte,error){
+	//Decrypt Ciphertext
+	hash := sha256.New()
+	label := []byte("")
+	plainText, err := rsa.DecryptOAEP(hash, rand.Reader, priv_key, *ciphertext, label)
+	if err!=nil{
+		return nil,err
+	}
+	// Verify Signature
+	// TODO
+	// newhash := crypto.SHA256
+	// err = rsa.VerifyPSS(sender_pubkey, newhash, hashed, signature, &opts)
+
+	return &plainText,nil
+}
+
 
 func get_size(path string) (int64, error) {
 	/*Gets the size of directory*/
