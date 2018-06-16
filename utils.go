@@ -1,9 +1,17 @@
 package main 
 
+import "bytes"
+import "crypto/aes"
+import "crypto/cipher"
+import "crypto/rand"
+import "errors"
 import "fmt"
+import "github.com/pierrre/archivefile/zip"
+import "io"
 import "io/ioutil"
 import "os"
 import "path/filepath"
+
 
 
 
@@ -80,6 +88,70 @@ func get_cwd()*string{
     }
     return &dir
 }
+
+func dir_to_compressed_bytes(dirname string)(*[]byte,error){
+	/* Compresses a directory and converts it to byte array*/
+
+	buf := new(bytes.Buffer)
+	progress := func(archivePath string){}
+	err := zip.Archive(dirname,buf,progress)
+	var arr []byte = buf.Bytes()
+	return &arr,err
+
+}
+
+func Encrypt(plaintextptr *[]byte, key *[32]byte) (*[]byte, error) {
+	/* Encrypts a byte array with a key*/
+
+	var plaintext []byte = *plaintextptr
+
+	block, err := aes.NewCipher(key[:])
+	if err != nil {
+		return nil, err
+	}
+
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+
+	nonce := make([]byte, gcm.NonceSize())
+	_, err = io.ReadFull(rand.Reader, nonce)
+	if err != nil {
+		return nil, err
+	}
+
+	ciphertext:= gcm.Seal(nonce, nonce, plaintext, nil)
+	return &ciphertext,nil
+}
+
+func Decrypt(ciphertextptr *[]byte, key *[32]byte) (*[]byte,error) {
+	/* Decrypts a byte array with a key*/
+
+	var ciphertext []byte = *ciphertextptr
+
+	block, err := aes.NewCipher(key[:])
+	if err != nil {
+		return nil, err
+	}
+
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(ciphertext) < gcm.NonceSize() {
+		return nil, errors.New("malformed ciphertext")
+	}
+
+	plaintext,plaintexterr:= gcm.Open(nil,
+		ciphertext[:gcm.NonceSize()],
+		ciphertext[gcm.NonceSize():],
+		nil,
+	)
+	return &plaintext,plaintexterr
+} 
+
 
 
 
