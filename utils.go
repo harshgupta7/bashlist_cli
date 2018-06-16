@@ -1,10 +1,8 @@
 package main 
 
 import "bytes"
-import "errors"
 import "fmt"
 import "github.com/pierrre/archivefile/zip"
-import "io"
 import "io/ioutil"
 import "os"
 import "path/filepath"

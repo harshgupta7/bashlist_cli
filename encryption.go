@@ -6,6 +6,9 @@ import "crypto/cipher"
 import "crypto/rand"
 import "crypto/rsa"
 import "crypto/sha256"
+import "errors"
+import "io"
+
 
 
 func generate_key_pair()(*rsa.PrivateKey,*rsa.PublicKey,error){
