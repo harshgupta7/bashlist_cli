@@ -1,6 +1,7 @@
 package main 
 
 import "bytes"
+import "crypto"
 import "crypto/aes"
 import "crypto/cipher"
 import "crypto/rand"
@@ -65,13 +66,13 @@ func generate_key_pair()(*rsa.PrivateKey,*rsa.PublicKey,error){
 		return nil,nil,err
 	}
 	pubkey := &privkey.PublicKey
-	return &privkey,&pubkey,err
+	return privkey,pubkey,err
 }
 
 func encrypt_with_pubkey(msg []byte,priv_key *rsa.PrivateKey,rec_key *rsa.PublicKey)(*[]byte,*[]byte,error){
     label := []byte("")
 	hash := sha256.New()
-	ciphertext, err := rsa.EncryptOAEP(hash, rand.Reader, *rec_key, msg, label)
+	ciphertext, err := rsa.EncryptOAEP(hash, rand.Reader, rec_key, msg, label)
 	if err!=nil{
 		return nil,nil,err
 	}
@@ -82,18 +83,18 @@ func encrypt_with_pubkey(msg []byte,priv_key *rsa.PrivateKey,rec_key *rsa.Public
 	pssh := newhash.New()
 	pssh.Write(PSSmessage)
 	hashed := pssh.Sum(nil)
-	signature, sign_err := rsa.SignPSS(rand.Reader, *priv_key, newhash, hashed, &opts)
+	signature, sign_err := rsa.SignPSS(rand.Reader, priv_key, newhash, hashed, &opts)
 	if sign_err!=nil{
 		return nil,nil,sign_err
 	} 
 	return &ciphertext,&signature,nil
 }
 
-func decrypt_with_privkey(priv_key *rsa.PrivateKey, sender_pubkey *rsa.PublicKey, ciphertext *[]byte){
+func decrypt_with_privkey(priv_key *rsa.PrivateKey, sender_pubkey *rsa.PublicKey, ciphertext *[]byte)(*[]byte,error){
 	//Decrypt Ciphertext
 	hash := sha256.New()
 	label := []byte("")
-	plainText, err := rsa.DecryptOAEP(hash, rand.Reader, *priv_key, *ciphertext, label)
+	plainText, err := rsa.DecryptOAEP(hash, rand.Reader, priv_key, *ciphertext, label)
 	if err!=nil{
 		return nil,err
 	}
@@ -102,7 +103,7 @@ func decrypt_with_privkey(priv_key *rsa.PrivateKey, sender_pubkey *rsa.PublicKey
 	// newhash := crypto.SHA256
 	// err = rsa.VerifyPSS(sender_pubkey, newhash, hashed, signature, &opts)
 
-	return &plaintext
+	return &plainText,nil
 }
 
 
