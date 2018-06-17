@@ -6,6 +6,8 @@ import "crypto/cipher"
 import "crypto/rand"
 import "crypto/rsa"
 import "crypto/sha256"
+import "crypto/x509"
+import "encoding/pem"
 import "errors"
 import "io"
 
