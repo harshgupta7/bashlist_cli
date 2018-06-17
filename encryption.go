@@ -19,6 +19,15 @@ const keylen = 32
 const iterations = 10000
 
 
+func AuthPassFromPassword(password string) string{
+
+	sha_256 := sha256.New()
+	sha_256.Write([]byte(password))
+	hashval:= fmt.Sprintf("%x",sha_256.Sum(nil))
+	return hashval
+
+}
+
 func EncryptWithPubKey(msg []byte,priv_key *rsa.PrivateKey,rec_key *rsa.PublicKey)(*[]byte,*[]byte,error){
 
 	/* Encrypts and signs message with receivers private key*/
@@ -58,7 +67,7 @@ func DecryptWithPrivKey(priv_key *rsa.PrivateKey,ciphertext *[]byte)(*[]byte,err
 	return &plainText,nil
 }
 
-func Encrypt(plaintextptr *[]byte, key *[32]byte) (*[]byte, error) {
+func EncryptObject(plaintextptr *[]byte, key *[32]byte) (*[]byte, error) {
 	/* Encrypts a byte array with a key*/
 
 	var plaintext []byte = *plaintextptr
@@ -83,7 +92,7 @@ func Encrypt(plaintextptr *[]byte, key *[32]byte) (*[]byte, error) {
 	return &ciphertext,nil
 }
 
-func Decrypt(ciphertextptr *[]byte, key *[32]byte) (*[]byte,error) {
+func DecryptObject(ciphertextptr *[]byte, key *[32]byte) (*[]byte,error) {
 	/* Decrypts a byte array with a key*/
 
 	var ciphertext []byte = *ciphertextptr
@@ -233,10 +242,10 @@ func decrypt_secret(encryptedptr *string, password string) (*string,error) {
     return &val,nil
 }
 func base64Encode(src []byte) string {
-  return base64.StdEncoding.EncodeToString(src)
+    return base64.StdEncoding.EncodeToString(src)
 }
 
 func base64Decode(src []byte) ([]byte, error) {
-  return base64.StdEncoding.DecodeString(string(src))
+    return base64.StdEncoding.DecodeString(string(src))
 }
 
