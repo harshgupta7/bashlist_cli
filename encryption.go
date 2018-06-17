@@ -3,27 +3,21 @@ package main
 import "crypto"
 import "crypto/aes"
 import "crypto/cipher"
+import "crypto/md5"
 import "crypto/rand"
 import "crypto/rsa"
 import "crypto/sha256"
 import "crypto/x509"
+import "encoding/base64"
 import "encoding/pem"
 import "errors"
+import "golang.org/x/crypto/pbkdf2"
 import "io"
 
+const saltlen = 8
+const keylen = 32
+const iterations = 10000
 
-
-func GenerateKeyPair()(*rsa.PrivateKey,*rsa.PublicKey,error){
-
-	/* Generates RSA Key-Pair*/
-	
-	privkey, err := rsa.GenerateKey(rand.Reader, 1024)
-	if err!=nil{
-		return nil,nil,err
-	}
-	pubkey := &privkey.PublicKey
-	return privkey,pubkey,err
-}
 
 func EncryptWithPubKey(msg []byte,priv_key *rsa.PrivateKey,rec_key *rsa.PublicKey)(*[]byte,*[]byte,error){
 
@@ -176,3 +170,73 @@ func ParseRsaPublicKeyFromPemStr(pubPEM string) (*rsa.PublicKey, error) {
     }
     return nil, errors.New("Key type is not RSA")
 }
+
+func encrypt_secret(plaintextptr *string, password string) (*string,error) {
+
+	plaintext:=*plaintextptr
+
+    header := make([]byte, saltlen + aes.BlockSize)
+
+    salt := header[:saltlen]
+    if _, err := io.ReadFull(rand.Reader, salt); err != nil {
+        return nil,err
+    }
+
+    iv := header[saltlen:aes.BlockSize+saltlen]
+    if _, err := io.ReadFull(rand.Reader, iv); err != nil {
+        return nil,err
+    }
+
+    key := pbkdf2.Key([]byte(password), salt, iterations, keylen, md5.New)
+
+    block, err := aes.NewCipher(key)
+    if err != nil {
+        return nil,err
+    }
+
+    ciphertext := make([]byte, len(header) + len(plaintext))
+    copy(ciphertext, header)
+
+    stream := cipher.NewCFBEncrypter(block, iv)
+    stream.XORKeyStream(ciphertext[aes.BlockSize+saltlen:], []byte(plaintext))
+    val := base64Encode(ciphertext)
+    return &val,nil
+}
+
+func decrypt_secret(encryptedptr *string, password string) (*string,error) {
+
+	encrypted := *encryptedptr
+
+    a, err := base64Decode([]byte(encrypted))
+    if err != nil {
+      return nil,err
+    }
+    ciphertext := a
+    salt := ciphertext[:saltlen]
+    iv := ciphertext[saltlen:aes.BlockSize+saltlen]
+    key := pbkdf2.Key([]byte(password), salt, iterations, keylen, md5.New)
+
+    block, err := aes.NewCipher(key)
+    if (err != nil) {
+        return nil,err
+    }
+
+    if len(ciphertext) < aes.BlockSize {
+        return nil,nil
+    }
+
+    decrypted := ciphertext[saltlen+aes.BlockSize:]
+    stream := cipher.NewCFBDecrypter(block, iv)
+    stream.XORKeyStream(decrypted, decrypted)
+
+    val := string(decrypted)
+    return &val,nil
+}
+func base64Encode(src []byte) string {
+  return base64.StdEncoding.EncodeToString(src)
+}
+
+func base64Decode(src []byte) ([]byte, error) {
+  return base64.StdEncoding.DecodeString(string(src))
+}
+
