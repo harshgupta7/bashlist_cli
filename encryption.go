@@ -11,6 +11,7 @@ import "crypto/x509"
 import "encoding/base64"
 import "encoding/pem"
 import "errors"
+import "fmt"
 import "golang.org/x/crypto/pbkdf2"
 import "io"
 
@@ -70,7 +71,7 @@ func DecryptWithPrivKey(priv_key *rsa.PrivateKey,ciphertext *[]byte)(*[]byte,err
 func EncryptObject(plaintextptr *[]byte, key *[32]byte) (*[]byte, error) {
 	/* Encrypts a byte array with a key*/
 
-	var plaintext []byte = *plaintextptr
+	var plaintext = *plaintextptr
 
 	block, err := aes.NewCipher(key[:])
 	if err != nil {
@@ -95,7 +96,7 @@ func EncryptObject(plaintextptr *[]byte, key *[32]byte) (*[]byte, error) {
 func DecryptObject(ciphertextptr *[]byte, key *[32]byte) (*[]byte,error) {
 	/* Decrypts a byte array with a key*/
 
-	var ciphertext []byte = *ciphertextptr
+	var ciphertext = *ciphertextptr
 
 	block, err := aes.NewCipher(key[:])
 	if err != nil {
@@ -226,7 +227,7 @@ func decrypt_secret(encryptedptr *string, password string) (*string,error) {
     key := pbkdf2.Key([]byte(password), salt, iterations, keylen, md5.New)
 
     block, err := aes.NewCipher(key)
-    if (err != nil) {
+    if err != nil {
         return nil,err
     }
 

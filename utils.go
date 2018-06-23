@@ -1,14 +1,49 @@
 package main 
 
 import "bytes"
+import "crypto/rand"
 import "fmt"
 import "github.com/pierrre/archivefile/zip"
 import "io/ioutil"
 import "os"
 import "path/filepath"
+import "errors"
 
 
 
+
+func generate_random_string(length int)(string,error){
+
+	var chars = []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
+	if length == 0 {
+		return "",nil
+	}
+	clen := len(chars)
+	if clen < 2 || clen > 256 {
+		return "",errors.New("Insufficient length size")
+		
+	}
+	maxrb := 255 - (256 % clen)
+	b := make([]byte, length)
+	r := make([]byte, length+(length/4)) 
+	i := 0
+	for {
+		if _, err := rand.Read(r); err != nil {
+			return "",err
+		}
+		for _, rb := range r {
+			c := int(rb)
+			if c > maxrb {
+				continue
+			}
+			b[i] = chars[c%clen]
+			i++
+			if i == length {
+				return string(b),nil
+			}
+		}
+	}
+}
 
 func object_exists(path string) (bool, error) {
 	/* Checks whether a path is a valid path*/
@@ -26,7 +61,7 @@ func IsDirectory(path string) (bool, error) {
 }
 
 
-func bucket_exists(dirname string)(bool){
+func directory_exists(dirname string)(bool){
 	/*Checks whether a directory exists in the cwd or not*/
 	cwd_address := get_cwd()
 	cwd := *cwd_address
@@ -54,7 +89,8 @@ func bucket_exists(dirname string)(bool){
 
 
 func get_size(path string) (int64, error) {
-	/*Gets the size of directory*/
+	/*Gets the size of object*/
+	//WARNING: MUST CHECK FOR EXISTENCE BEFORE USING. FAILURE WILL RESULT IN SEG FAULT.
     var size int64
     err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
         if !info.IsDir() {
@@ -91,7 +127,7 @@ func dir_to_compressed_bytes(dirname string)(*[]byte,error){
 	buf := new(bytes.Buffer)
 	progress := func(archivePath string){}
 	err := zip.Archive(dirname,buf,progress)
-	var arr []byte = buf.Bytes()
+	var arr = buf.Bytes()
 	return &arr,err
 
 }
