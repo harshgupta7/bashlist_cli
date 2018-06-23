@@ -58,6 +58,10 @@ func open_account_url(url string ){
 
 func open_account_handler(){
 	url := get_account_url()
+	if url=="NONE"{
+		color.Red("Bashlist encountered an unexpected error! Please try again later!")
+		return
+	}
 	open_account_url(url)
 	return
 }

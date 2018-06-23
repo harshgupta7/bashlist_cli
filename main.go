@@ -14,7 +14,8 @@ func main(){
 	//b:=*d
 	//fmt.Print(a)
 	//fmt.Print(b)
-	open_account_handler()
+	//open_account_handler()
+	print_list()
 
 }
 
