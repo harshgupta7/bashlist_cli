@@ -15,7 +15,8 @@ func main(){
 	//fmt.Print(a)
 	//fmt.Print(b)
 	//open_account_handler()
-	print_list()
+	//print_list()
+	upload_handler("swcli")
 
 }
 

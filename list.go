@@ -58,7 +58,7 @@ func print_list(){
 		}
 		if empty=="T"{
 			color.Cyan("Your Bashlist Storage is Empty!")
-			color.Cyan("Upload your first directory using bls push")
+			color.Cyan("Upload your first directory using bashls push")
 			return
 		} else {
 

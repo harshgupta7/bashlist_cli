@@ -68,36 +68,36 @@ func DecryptWithPrivKey(priv_key *rsa.PrivateKey,ciphertext *[]byte)(*[]byte,err
 	return &plainText,nil
 }
 
-func EncryptObject(plaintextptr *[]byte, key *[32]byte) (*[]byte, error) {
+func EncryptObject(plaintextptr *[]byte, keyptr *[]byte,encrypted chan *[]byte ) () {
 	/* Encrypts a byte array with a key*/
 
 	var plaintext = *plaintextptr
-
+	key := *keyptr
 	block, err := aes.NewCipher(key[:])
 	if err != nil {
-		return nil, err
+		encrypted<-nil
 	}
 
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
-		return nil, err
+		encrypted<-nil
 	}
 
 	nonce := make([]byte, gcm.NonceSize())
 	_, err = io.ReadFull(rand.Reader, nonce)
 	if err != nil {
-		return nil, err
+		encrypted<-nil
 	}
 
 	ciphertext:= gcm.Seal(nonce, nonce, plaintext, nil)
-	return &ciphertext,nil
+	encrypted<-&ciphertext
 }
 
-func DecryptObject(ciphertextptr *[]byte, key *[32]byte) (*[]byte,error) {
+func DecryptObject(ciphertextptr *[]byte, keyptr *[]byte) (*[]byte,error) {
 	/* Decrypts a byte array with a key*/
 
 	var ciphertext = *ciphertextptr
-
+	key := *keyptr
 	block, err := aes.NewCipher(key[:])
 	if err != nil {
 		return nil, err

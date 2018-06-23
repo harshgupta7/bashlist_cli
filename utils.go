@@ -7,7 +7,10 @@ import "github.com/pierrre/archivefile/zip"
 import "io/ioutil"
 import "os"
 import "path/filepath"
-import "errors"
+import (
+	"errors"
+	"github.com/fatih/color"
+)
 
 
 
@@ -68,7 +71,7 @@ func directory_exists(dirname string)(bool){
 	path := cwd+"/"+dirname
 	exists,err:=object_exists(path)
 	if err!=nil{
-		fmt.Println("An Unexpected Error Occurred.Please Try Again Later")
+		color.Red("An Unexpected Error Occurred.Please Try Again Later")
 		os.Exit(1)
 	}
 	if !exists{
@@ -77,12 +80,13 @@ func directory_exists(dirname string)(bool){
 	}
 	isDir,dirErr := IsDirectory(path)
 	if dirErr!=nil{
-		fmt.Println("An Unexpected Error Occurred.Please Try Again Later")
+		color.Red("An Unexpected Error Occurred.Please Try Again Later")
 		os.Exit(1)
 	}
 	if !isDir{
 		fmt.Println(dirname+": Not a directory. Only directories can be pushed to bashlist.")
-		os.Exit(1)
+		fmt.Println("Place "+dirname+" inside a directory to push.")
+		return false
 	}
 	return true
 }
@@ -121,17 +125,24 @@ func get_cwd()*string{
     return &dir
 }
 
-func dir_to_compressed_bytes(dirname string)(*[]byte,error){
+func dir_to_compressed_bytes(dirname string,done chan *[]byte)() {
 	/* Compresses a directory and converts it to byte array*/
-
+	donesig := color.New(color.FgGreen).SprintFunc()
 	buf := new(bytes.Buffer)
-	progress := func(archivePath string){}
-	err := zip.Archive(dirname,buf,progress)
-	var arr = buf.Bytes()
-	return &arr,err
+	progress := func(archivePath string) {
+		fmt.Printf("Processing: %s....%s\n", archivePath, donesig("OK"))
+	}
+	err := zip.Archive(dirname, buf, progress)
+	if err != nil {
+		color.Red("Bashlist encountered an unexpected error while processing %s", dirname)
+	}
+
+	var arr= buf.Bytes()
+	done <- &arr
+
+	close(done)
 
 }
-
 
 
 

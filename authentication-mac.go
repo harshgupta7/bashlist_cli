@@ -15,7 +15,7 @@ import (
 var nativeStore = osxkeychain.Osxkeychain{}
 
 
-func get_username_password()(*string,*string){
+func get_username_password()(*string,*string,*string){
 	/*Shows a prompt to enter username and password and returns them*/
 
 	// TODO: VALIDATE STRINGS
@@ -34,7 +34,7 @@ func get_username_password()(*string,*string){
 	pass, _ := gopass.GetPasswdMasked()
 	stringPass := string(pass)
 	hashedPass:= AuthPassFromPassword(stringPass)
-	return &username,&hashedPass
+	return &username,&hashedPass,&stringPass
 }
 
 func save_secret(url string, username *string, secret *string) {
@@ -71,7 +71,7 @@ func incorrect_auth_loop() {
 	/* Infinite Loop that runs till users enters a wrong username/password combination*/
 	endpoint := URL + TEST_AUTH_ENDPOINT
 	for {
-		usernamePtr, passwordPtr:=get_username_password()
+		usernamePtr, passwordPtr,realPass:=get_username_password()
 		username := *usernamePtr
 		hashedPassword := *passwordPtr
 		r := req.New()
@@ -95,6 +95,7 @@ func incorrect_auth_loop() {
 			}
 			if response=="T"{
 				save_secret("Bashlist-Credentials/Credentials",usernamePtr,passwordPtr)
+				save_secret("Bashlist-Credentials/Safe-Credentials",usernamePtr,realPass)
 				return
 			}else{
 				continue
