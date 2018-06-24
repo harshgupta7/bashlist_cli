@@ -2,17 +2,20 @@ package main
 
 import (
 	"github.com/imroc/req"
-	"time"
+	//"time"
 	"fmt"
-	"github.com/buger/jsonparser"
+	//"github.com/buger/jsonparser"
 	"encoding/json"
 	"github.com/fatih/color"
 	"os"
+
+	"strconv"
 	"bufio"
+	"github.com/buger/jsonparser"
 )
 
 type PushURLRequester struct{
-	Size int
+	Size string
 	Name string
 }
 
@@ -28,44 +31,90 @@ func upload_bucket(){
 	/*Uploads the bucket*/
 }
 
+func test_post(){
+
+	b := PushURLRequester{Size:string(312312),Name:"gagamama"}
+
+	mmd, _ := json.Marshal(b)
+	d,f,_ :=authHandler(0)
+	header := req.Header{
+		"Content-Type":"application/json",
+		"Email": *d,
+		"Password":*f,
+	}
+
+	//loc:=URL
+	endpoint:=URL+PUSH_BUCKET_REQ
+
+	resp, err := req.Post(endpoint, req.BodyJSON(mmd),header)
+	if err != nil {
+		//return "SSD12"
+		fmt.Print("AS")
+	}
+	fmt.Println(resp)
+	//return resp.String()
+
+
+}
+
 
 
 func upload_handler(dirname string) {
 	/* Method to manage upload*/
 
+	//Fetch username and password
 	usernamePtr, passwordPtr,err:=authHandler(0)
+
+	//Allocate byte array for compressed directory
 	var comp_bytes *[]byte
+
+
 	endpoint := URL + PUSH_BUCKET_REQ
 	ex := directory_exists(dirname)
+	//No Directory Exists Return
 	if ex ==false{
 		return
 	}
+
+	//Initiate operation
 	color.Cyan("Initiating Push:")
 	fmt.Println("  - "+ dirname)
+
+	//Channel to receive process directory
 	conf_comp := make(chan *[]byte)
+
+	//Initiate goroutine
 	go dir_to_compressed_bytes(dirname,conf_comp)
 
+	//Get Size
 	size,err := get_size(dirname)
 	if err!=nil{
 		color.Red("Bashlist encountered an unexpected error. Please try again later.")
 		os.Exit(1)
 	}
 
+
 	username := *usernamePtr
 	hashedPassword := *passwordPtr
-	r := req.New()
-	authHeader := req.Header{
-		"Email":        username,
+
+
+	header := req.Header{
+		"Content-Type":"application/json",
+		"Email": username,
 		"Password": hashedPassword,
 	}
-	//param := req.Param{
-	//	"Content-Type":  "application/json",
-	//}
 
-	values := PushURLRequester{Name:dirname,Size:int(size)}
-	jsonvalues,_ := json.Marshal(values)
-	r.SetTimeout(25 * time.Second)
-	c, err := r.Post(endpoint, authHeader,jsonvalues)
+	vals := PushURLRequester{Name:dirname,Size:strconv.Itoa(int(size))}
+	jsonvals,_ := json.Marshal(vals)
+
+
+	c, err := req.Post(endpoint, req.BodyJSON(jsonvals),header)
+	if err != nil {
+		//return "SSD12"
+		fmt.Print("AS")
+	}
+	fmt.Println(c)
+
 
 	if err!=nil{
 		<-conf_comp
@@ -78,11 +127,12 @@ func upload_handler(dirname string) {
 		usernamePtr, passwordPtr, _ = authHandler(1)
 		username = *usernamePtr
 		hashedPassword = *passwordPtr
-		authHeader = req.Header{
+		header = req.Header{
 			"Email":    username,
+			"Content-Type":"application/json",
 			"Password": hashedPassword,
 		}
-		c, err = r.Post(endpoint, authHeader, param, jsonvalues)
+		c, err = req.Post(endpoint, header, req.BodyJSON(jsonvals))
 		d = c.Response().StatusCode
 		if d == 403 {
 			color.Red("Authentication Error!. try again later.")
@@ -98,6 +148,7 @@ func upload_handler(dirname string) {
 		return
 	} else if d==399 {
 		<-conf_comp
+		fmt.Print("dadadadasdasdasdasdasdjj")
 		color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
 		return
 	} else{
@@ -106,12 +157,14 @@ func upload_handler(dirname string) {
 		exists, err := jsonparser.GetString(byteResp, "Exist")
 		if err!=nil{
 			<-conf_comp
+			fmt.Print("here")
 			color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
 			return
 		}
 		_, pass, err := retreive_secret("Bashlist-Credentials/Safe-Credentials")
 		if err != nil {
 			<-conf_comp
+			fmt.Print("dadas")
 			color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
 			return
 		}
@@ -124,6 +177,7 @@ func upload_handler(dirname string) {
 			enc_privKey, errprivkey := jsonparser.GetString(byteResp, "PrivKey")
 			if errkey != nil || errprivkey != nil {
 				<-conf_comp
+				fmt.Print("llr")
 				color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
 				return
 			}
@@ -141,6 +195,7 @@ func upload_handler(dirname string) {
 			key, errkey := jsonparser.GetString(byteResp, "Key")
 			if errkey!=nil{
 				<-conf_comp
+				fmt.Print("daa")
 				color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
 				return
 			}

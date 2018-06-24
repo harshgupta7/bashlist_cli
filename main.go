@@ -16,7 +16,8 @@ func main(){
 	//fmt.Print(b)
 	//open_account_handler()
 	//print_list()
+	delete_secret("Bashlist-Credentials/Credentials")
 	upload_handler("swcli")
-
+	//test_post()
 }
 

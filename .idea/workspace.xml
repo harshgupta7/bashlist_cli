@@ -4,13 +4,8 @@
     <list default="true" id="b85ee43d-60fe-40b6-bf21-c670f51cb0f1" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/account" beforeDir="false" afterPath="$PROJECT_DIR$/account" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/authentication-mac.go" beforeDir="false" afterPath="$PROJECT_DIR$/authentication-mac.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/encryption.go" beforeDir="false" afterPath="$PROJECT_DIR$/encryption.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/list.go" beforeDir="false" afterPath="$PROJECT_DIR$/list.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/uploader.go" beforeDir="false" afterPath="$PROJECT_DIR$/uploader.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils.go" beforeDir="false" afterPath="$PROJECT_DIR$/utils.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -28,13 +23,13 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="uploader.go" pinned="false" current-in-tab="true">
+      <file leaf-file-name="uploader.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/uploader.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="297">
-              <caret line="69" column="16" lean-forward="true" selection-start-line="69" selection-start-column="16" selection-end-line="69" selection-end-column="16" />
+            <state relative-caret-position="638">
+              <caret line="166" column="28" selection-start-line="166" selection-start-column="23" selection-end-line="166" selection-end-column="28" />
               <folding>
-                <element signature="e#14#94#0" expanded="true" />
+                <element signature="e#14#149#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -61,11 +56,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.go" pinned="false" current-in-tab="false">
+      <file leaf-file-name="main.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="22" selection-start-line="22" selection-end-line="22" />
+            <state relative-caret-position="345">
+              <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
             </state>
           </provider>
         </entry>
@@ -73,8 +68,8 @@
       <file leaf-file-name="authentication-mac.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/authentication-mac.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="343">
-              <caret line="97" column="66" selection-start-line="97" selection-start-column="50" selection-end-line="97" selection-end-column="66" />
+            <state relative-caret-position="545">
+              <caret line="96" column="61" lean-forward="true" selection-start-line="96" selection-start-column="29" selection-end-line="96" selection-end-column="61" />
               <folding>
                 <element signature="e#14#301#0" expanded="true" />
               </folding>
@@ -133,8 +128,9 @@
     <findStrings>
       <find>time</find>
       <find>save_se</find>
-      <find>get_</find>
       <find>[Y/n]</find>
+      <find>dadas</find>
+      <find>get_</find>
     </findStrings>
   </component>
   <component name="GOROOT" path="/usr/local/Cellar/go/1.10.2/libexec" />
@@ -146,12 +142,12 @@
       <list>
         <option value="$PROJECT_DIR$/account.go" />
         <option value="$PROJECT_DIR$/list.go" />
-        <option value="$PROJECT_DIR$/main.go" />
         <option value="$PROJECT_DIR$/config.go" />
         <option value="$PROJECT_DIR$/authentication-mac.go" />
         <option value="$PROJECT_DIR$/encryption.go" />
         <option value="$PROJECT_DIR$/utils.go" />
         <option value="$PROJECT_DIR$/uploader.go" />
+        <option value="$PROJECT_DIR$/main.go" />
       </list>
     </option>
   </component>
@@ -193,6 +189,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="DefaultGoTemplateProperty" value="Go File" />
+    <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file:///Users/harsh/Desktop/cli/cli/main.go" />
     <property name="go.gopath.indexing.explicitly.defined" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
@@ -255,15 +252,15 @@
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Version Control" order="9" />
       <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.3296593" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="7" />
+      <window_info anchor="bottom" id="Terminal" order="8" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -289,7 +286,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state>
           <folding>
-            <element signature="e#14#94#0" expanded="true" />
+            <element signature="e#14#149#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -476,16 +473,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/authentication-mac.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="343">
-          <caret line="97" column="66" selection-start-line="97" selection-start-column="50" selection-end-line="97" selection-end-column="66" />
-          <folding>
-            <element signature="e#14#301#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/list.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="337">
@@ -508,13 +495,6 @@
         <state relative-caret-position="-556" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="22" selection-start-line="22" selection-end-line="22" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/utils.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="242">
@@ -534,11 +514,28 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/uploader.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="297">
-          <caret line="69" column="16" lean-forward="true" selection-start-line="69" selection-start-column="16" selection-end-line="69" selection-end-column="16" />
+        <state relative-caret-position="638">
+          <caret line="166" column="28" selection-start-line="166" selection-start-column="23" selection-end-line="166" selection-end-column="28" />
           <folding>
-            <element signature="e#14#94#0" expanded="true" />
+            <element signature="e#14#149#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/authentication-mac.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="545">
+          <caret line="96" column="61" lean-forward="true" selection-start-line="96" selection-start-column="29" selection-end-line="96" selection-end-column="61" />
+          <folding>
+            <element signature="e#14#301#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
         </state>
       </provider>
     </entry>
