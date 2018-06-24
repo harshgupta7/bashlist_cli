@@ -62,17 +62,20 @@ func test_post(){
 func upload_handler(dirname string) {
 	/* Method to manage upload*/
 
+
 	//Fetch username and password
 	usernamePtr, passwordPtr,err:=authHandler(0)
 
 	//Allocate byte array for compressed directory
 	var comp_bytes *[]byte
 
-
+	//Endpoint to get upload URL
 	endpoint := URL + PUSH_BUCKET_REQ
+
+	//Check if directory Exists
 	ex := directory_exists(dirname)
 	//No Directory Exists Return
-	if ex ==false{
+	if ex==false{
 		return
 	}
 
@@ -80,7 +83,7 @@ func upload_handler(dirname string) {
 	color.Cyan("Initiating Push:")
 	fmt.Println("  - "+ dirname)
 
-	//Channel to receive process directory
+	//Channel to receive compressed directory
 	conf_comp := make(chan *[]byte)
 
 	//Initiate goroutine
@@ -93,67 +96,84 @@ func upload_handler(dirname string) {
 		os.Exit(1)
 	}
 
-
+	//Retrieve Username & Password
 	username := *usernamePtr
 	hashedPassword := *passwordPtr
 
-
+	//Header for getting push URL
 	header := req.Header{
 		"Content-Type":"application/json",
 		"Email": username,
 		"Password": hashedPassword,
 	}
 
+	//JSON Representation of directory name and size
 	vals := PushURLRequester{Name:dirname,Size:strconv.Itoa(int(size))}
 	jsonvals,_ := json.Marshal(vals)
 
-
-	c, err := req.Post(endpoint, req.BodyJSON(jsonvals),header)
+	//Perform Post and receive URL
+	resp, err := req.Post(endpoint, req.BodyJSON(jsonvals),header)
+	//Error Performing Post
 	if err != nil {
-		//return "SSD12"
-		fmt.Print("AS")
+		//Do it once More
+		resp, err = req.Post(endpoint, req.BodyJSON(jsonvals),header)
 	}
-	fmt.Println(c)
 
-
+	//Second Time Error
 	if err!=nil{
 		<-conf_comp
 		color.Red("Could not connect to server. Please check your connection and try again later.")
 		return
 	}
-	d := c.Response().StatusCode
-	if d==403 {
+
+	//Get Response Code
+	respCode := resp.Response().StatusCode
+
+	//Authentication Error
+	if respCode==403 {
+		//Finish Compression
 		comp_bytes = <-conf_comp
+		//Request Fresh Username & Password From AuthHandler
 		usernamePtr, passwordPtr, _ = authHandler(1)
+
+		//Retrieve u/p values
 		username = *usernamePtr
 		hashedPassword = *passwordPtr
 		header = req.Header{
-			"Email":    username,
 			"Content-Type":"application/json",
+			"Email":    username,
 			"Password": hashedPassword,
 		}
-		c, err = req.Post(endpoint, header, req.BodyJSON(jsonvals))
-		d = c.Response().StatusCode
-		if d == 403 {
+		resp, err = req.Post(endpoint, header, req.BodyJSON(jsonvals))
+		respCode = resp.Response().StatusCode
+		//Technically should never happen,as U/P values are saved after auth_check with server.
+		if respCode == 403 {
 			color.Red("Authentication Error!. try again later.")
 			return
 		}
-	} else if d==423 {
+	//Insufficient Space Error
+	} else if respCode==423 {
 		<-conf_comp
-		color.Red("Insufficient remaining space to add %s ", dirname)
+		color.Red("Insufficient remaining space to add %s to your bashlist.", dirname)
 		return
-	} else if d==424{
+	//Insufficient Space - Shared Directory
+	} else if respCode==424{
 		<-conf_comp
 		color.Red("%s is a shared directory. The owner has insufficient remaining space for this push",dirname)
 		return
-	} else if d==399 {
+	//Other Server Error
+	} else if respCode==399 {
 		<-conf_comp
-		fmt.Print("dadadadasdasdasdasdasdjj")
 		color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
 		return
+	//Received a valid response from server
 	} else{
-		var desc string = "NU"
-		byteResp, _ := c.ToBytes()
+
+		//Set Description to Null Value
+		var desc string = "~N////V~"
+
+
+		byteResp, _ := resp.ToBytes()
 		exists, err := jsonparser.GetString(byteResp, "Exist")
 		if err!=nil{
 			<-conf_comp
@@ -229,7 +249,7 @@ func upload_handler(dirname string) {
 		}
 
 		encrypted_bytes :=<-conf_encryption
-		if encrypted_bytes!=nil{
+		if encrypted_bytes==nil{
 			color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
 			return
 		}

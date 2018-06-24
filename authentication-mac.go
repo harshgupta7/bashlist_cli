@@ -71,7 +71,7 @@ func incorrect_auth_loop() {
 	/* Infinite Loop that runs till users enters a wrong username/password combination*/
 	endpoint := URL + TEST_AUTH_ENDPOINT
 	for {
-		usernamePtr, passwordPtr,realPass:=get_username_password()
+		usernamePtr, passwordPtr,realPassPtr:=get_username_password()
 		username := *usernamePtr
 		hashedPassword := *passwordPtr
 		r := req.New()
@@ -95,7 +95,7 @@ func incorrect_auth_loop() {
 			}
 			if response=="T"{
 				save_secret("Bashlist-Credentials/Credentials",usernamePtr,passwordPtr)
-				save_secret("Bashlist-Credentials/Safe-Credentials",usernamePtr,realPass)
+				save_secret("Bashlist-Credentials/Safe-Credentials",usernamePtr,realPassPtr)
 				return
 			}else{
 				continue
