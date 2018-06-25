@@ -83,6 +83,7 @@ func incorrect_auth_loop() {
 		c, err := r.Get(endpoint, authHeader)
 		if err!=nil{
 			fmt.Println("Error contacting server! Please check your connection.")
+			return
 		}
 		d := c.Response().StatusCode
 		if d==403{
@@ -103,6 +104,7 @@ func incorrect_auth_loop() {
 		}
 	}
 }
+
 
 
 

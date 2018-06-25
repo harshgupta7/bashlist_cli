@@ -91,6 +91,7 @@ func EncryptObject(plaintextptr *[]byte, keyptr *[]byte,encrypted chan *[]byte )
 
 	ciphertext:= gcm.Seal(nonce, nonce, plaintext, nil)
 	encrypted<-&ciphertext
+	close(encrypted)
 }
 
 func DecryptObject(ciphertextptr *[]byte, keyptr *[]byte) (*[]byte,error) {

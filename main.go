@@ -16,8 +16,20 @@ func main(){
 	//fmt.Print(b)
 	//open_account_handler()
 	//print_list()
-
+	//delete_secret("Bashlist-Credentials/Credentials")
+	//delete_secret("Bashlist-Credentials/Safe-Credentials")
 	upload_handler("swcli")
 	//test_post()
+	//var desc string
+	//fmt.Print("Description (Press Enter to Leave Blank): ")
+	//scanner := bufio.NewScanner(os.Stdin)
+	//for scanner.Scan() {
+	//	desc = scanner.Text()
+	//	break
+	//}
+	//fmt.Println(desc)
+
+
 }
+
 

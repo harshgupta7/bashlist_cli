@@ -4,14 +4,21 @@ import (
 	"github.com/imroc/req"
 	//"time"
 	"fmt"
-	//"github.com/buger/jsonparser"
 	"encoding/json"
 	"github.com/fatih/color"
 	"os"
 
 	"strconv"
-	"bufio"
+	//"bufio"
 	"github.com/buger/jsonparser"
+	"bufio"
+	//"net/http"
+	//"bytes"
+	"bytes"
+	"io"
+	"log"
+	"mime/multipart"
+	"net/http"
 )
 
 type PushURLRequester struct{
@@ -27,8 +34,112 @@ func encrypt_bucket(){
 	/* Encrypts the bucket*/
 }
 
-func upload_bucket(){
-	/*Uploads the bucket*/
+func unexpected_event(){
+	color.Red("Bashlist encountered an unexpected error. Please try again later.")
+	os.Exit(1)
+}
+
+func upload_bucket(encrypted_bytes *[]byte, resp *[]byte, dirname string){
+
+	aws_url,err := jsonparser.GetString(*resp,"URL","url")
+	if err!=nil{
+		unexpected_event()
+	}
+
+	file := bytes.NewReader(*encrypted_bytes)
+	// Buffer to store our request body as bytes
+	var requestBody bytes.Buffer
+	// Create a multipart writer
+	multiPartWriter := multipart.NewWriter(&requestBody)
+
+	// Initialize the file field
+	fileWriter, err := multiPartWriter.CreateFormFile("file_field", dirname)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	// Copy the actual file content to the field field's writer
+	_, err = io.Copy(fileWriter, file)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	paramFields,_,_,err1 := jsonparser.Get(*resp,"URL","fields")
+	if err1!=nil{
+		unexpected_event()
+	}
+	fieldacl,err2 := jsonparser.GetString(paramFields,"acl")
+	if err2!=nil{
+		unexpected_event()
+	}
+	fieldKey,err2 := jsonparser.GetString(paramFields,"key")
+	if err2!=nil{
+		unexpected_event()
+	}
+	fieldAWSAccessKeyId,err2 := jsonparser.GetString(paramFields,"AWSAccessKeyId")
+	if err2!=nil{
+		unexpected_event()
+	}
+	fieldPolicy,err2 := jsonparser.GetString(paramFields,"policy")
+	if err2!=nil{
+		unexpected_event()
+	}
+	fieldSignature,err2 := jsonparser.GetString(paramFields,"signature")
+	if err2!=nil{
+		unexpected_event()
+	}
+
+	err = multiPartWriter.WriteField("acl",fieldacl)
+	if err!=nil{
+		unexpected_event()
+	}
+	err = multiPartWriter.WriteField("key",fieldKey)
+	if err!=nil{
+		unexpected_event()
+	}
+	err = multiPartWriter.WriteField("AWSAccessKeyId",fieldAWSAccessKeyId)
+	if err!=nil{
+		unexpected_event()
+	}
+	err = multiPartWriter.WriteField("policy",fieldPolicy)
+	if err!=nil{
+		unexpected_event()
+	}
+	err = multiPartWriter.WriteField("signature",fieldSignature)
+	if err!=nil{
+		unexpected_event()
+	}
+
+	// Populate other fields
+	fieldWriter, err := multiPartWriter.CreateFormField("normal_field")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	_, err = fieldWriter.Write([]byte("Value"))
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+
+	multiPartWriter.Close()
+
+	// By now our original request body should have been populated, so let's just use it with our custom request
+	req_, err := http.NewRequest("POST", aws_url, &requestBody)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	// We need to set the content type from the writer, it includes necessary boundary as well
+	req_.Header.Set("Content-Type", multiPartWriter.FormDataContentType())
+
+	// Do the request
+	client := &http.Client{}
+	fmt.Println(req_)
+	response, err := client.Do(req_)
+	if err != nil {
+		log.Fatalln(err)
+		fmt.Println("haha")
+	}
+
+	fmt.Println(response)
 }
 
 func test_post(){
@@ -172,72 +283,110 @@ func upload_handler(dirname string) {
 		//Set Description to Null Value
 		var desc string = "~N////V~"
 
-
+		//Get Byte Resp
 		byteResp, _ := resp.ToBytes()
+
+		//Check if the directory being pushed already exists. Need it to show confirmation messages.
 		exists, err := jsonparser.GetString(byteResp, "Exist")
 		if err!=nil{
+			//If exist variable isn't there. Unexpected response
 			<-conf_comp
-			fmt.Print("here")
 			color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
 			return
 		}
+		//Retrieve password to unlock file encryption ket
 		_, pass, err := retreive_secret("Bashlist-Credentials/Safe-Credentials")
+		//Technically should never happen as password and auth password get saved together
 		if err != nil {
 			<-conf_comp
-			fmt.Print("dadas")
-			color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
-			return
-		}
-
-		shared,err := jsonparser.GetString(byteResp,"Shared")
-		var file_key *[]byte
-		if shared=="Y" {
-
-			key, errkey := jsonparser.GetString(byteResp, "keyval")
-			enc_privKey, errprivkey := jsonparser.GetString(byteResp, "PrivKey")
-			if errkey != nil || errprivkey != nil {
-				<-conf_comp
-				fmt.Print("llr")
+			//Make user save secrets again
+			authHandler(1)
+			_, pass, err = retreive_secret("Bashlist-Credentials/Safe-Credentials")
+			//This should really never happen
+			if err!=nil{
 				color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
 				return
 			}
+		}
 
+		//Get whether directory is shared or not
+		shared,err := jsonparser.GetString(byteResp,"Shared")
+		//Allocate byte array for file key
+		var file_key *[]byte
+
+
+		if shared=="Y" {
+
+			//Get filekey encrypted with private key
+			key, errkey := jsonparser.GetString(byteResp, "keyval")
+			//Get private key encrypted with password
+			enc_privKey, errprivkey := jsonparser.GetString(byteResp, "PrivKey")
+			//If either of those values are not present, return
+			if errkey != nil || errprivkey != nil {
+				<-conf_comp
+				color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
+				return
+			}
+			//Decrypt Private key
 			privKey, _ := decrypt_secret(&enc_privKey, *pass)
+			//Build Private Key object
 			privKeyObj, err := ParseRsaPrivateKeyFromPemStr(*privKey)
+			//If error Parsing privatekey, return
 			if err != nil {
 				<-conf_comp
 				color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
 				return
 			}
+			//Convert key to byte array
 			byte_key := []byte(key)
+			//Decrypt with private key and get file key
 			file_key, _ = DecryptWithPrivKey(privKeyObj, &byte_key)
+
 		} else if shared=="N"{
+
+			//Get filedecryption key encrypted by password
 			key, errkey := jsonparser.GetString(byteResp, "Key")
+			//If error, return
 			if errkey!=nil{
 				<-conf_comp
-				fmt.Print("daa")
 				color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
 				return
 			}
-
+			//Retreive filekey by decrypting from password
 			file_key_string_ptr, _ := decrypt_secret(&key, *pass)
 			file_key_str := *file_key_string_ptr
 			file_key_byte := []byte(file_key_str)
 			file_key = &file_key_byte
 		}
-
+		//make sure compression is done, to start encryption
 		comp_bytes = <-conf_comp
+		//make channel for encryption
 		conf_encryption := make(chan *[]byte)
+		//Start encryption
 		go EncryptObject(comp_bytes,file_key,conf_encryption)
 
+		//Some lines to seperate from processing stdout
+		fmt.Println()
+		fmt.Println()
+
+		//Description Messages Printer
 		if exists=="Y"{
-			fmt.Println()
-			fmt.Print("A Directory "+dirname+" already exists in your bashlist. Pushing will update its contents. " +
-				"Do you want to continue?[Y/n]")
-			var response string
-			fmt.Scanln(&response)
-			if response=="n"||response=="N"||response=="No"||response=="no"{
-				return
+			if shared=="N" {
+				fmt.Print("A Directory " + dirname + " already exists in your bashlist. Pushing will update its contents. " +
+					"Do you want to continue?[Y/n]")
+				var response string
+				fmt.Scanln(&response)
+				if response == "n" || response == "N" || response == "No" || response == "no" {
+					return
+				}
+			}else{
+				fmt.Print("Directory " + dirname + " already exists and is a shared directory. Pushing will update its contents for all members. " +
+					"Do you want to continue?[Y/n]")
+				var response string
+				fmt.Scanln(&response)
+				if response == "n" || response == "N" || response == "No" || response == "no" {
+					return
+				}
 			}
 		} else {
 			fmt.Print("Description (Press Enter to Leave Blank): ")
@@ -247,14 +396,39 @@ func upload_handler(dirname string) {
 				break
 			}
 		}
-
+		fmt.Println("Encrypting contents")
 		encrypted_bytes :=<-conf_encryption
 		if encrypted_bytes==nil{
 			color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
 			return
 		}
-		fmt.Print(desc)
+		fmt.Println(desc)
 
+		//r := bytes.NewReader(*encrypted_bytes)
+
+		//upload_bucket(encrypted_bytes,&byteResp,dirname)
+		//prepareFields(&byteResp)
+		//d,_,_,_ := jsonparser.Get(byteResp,"URL","fields")
+		//c:=FieldsCreator(&d)
+		fmt.Println(string(byteResp))
+		u,_ := jsonparser.GetString(byteResp,"URL")
+		//f := io.Reader("config.go")
+		ff,_ := os.Open("config.go")
+		req_, err := http.NewRequest("PUT", u,ff)
+		fmt.Println(req_)
+		if err != nil {
+			fmt.Println("error creating request", u)
+			return
+		}
+		req_.ContentLength = 280
+		resp, err := http.DefaultClient.Do(req_)
+		if err != nil {
+			fmt.Println(err)
+			fmt.Println("Asdasdasdsadadad")
+			return
+
+		}
+		fmt.Println(resp)
 
 	}
 
