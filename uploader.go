@@ -273,7 +273,7 @@ func upload_handler(dirname string) {
 
 		valsConfirmer := PushConfirmer{Name:dirname,Shared:shared}
 		jsonvals,_ = json.Marshal(valsConfirmer)
-
+		endpoint = URL + PUSH_BUCKET_CONF
 		//Perform Post and receive URL
 		resp, err = req.Post(endpoint, req.BodyJSON(jsonvals),header)
 		respCode = resp.Response().StatusCode
@@ -284,7 +284,7 @@ func upload_handler(dirname string) {
 			}
 		}
 		if respCode!=225{
-
+			fmt.Println(respCode)
 			resp, err = req.Post(endpoint, req.BodyJSON(jsonvals),header)
 			if err!=nil{
 				resp, err = req.Post(endpoint, req.BodyJSON(jsonvals),header)
