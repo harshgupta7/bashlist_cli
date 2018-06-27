@@ -82,7 +82,7 @@ func incorrect_auth_loop() (*string,*string,*string){
 		r.SetTimeout(25 * time.Second)
 		c, err := r.Get(endpoint, authHeader)
 		if err!=nil{
-			fmt.Println("Error contacting server! Please check your connection.")
+			color.Red("Authentication Error! Please try again")
 			continue
 		}
 		d := c.Response().StatusCode

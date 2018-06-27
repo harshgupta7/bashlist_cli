@@ -18,6 +18,11 @@ type PushURLRequester struct{
 	Name string
 }
 
+type PushConfirmer struct{
+	Name string
+	Shared string
+}
+
 func get_upload_url(){
 	/* Gets upload url*/
 }
@@ -257,6 +262,43 @@ func upload_handler(dirname string) {
 	
 		uurl ,_:=jsonparser.GetString(byteResp,"URL","url")
 		upload_helper(&d,encrypted_bytes,uurl)
+
+
+		//send confirmation
+		header = req.Header{
+			"Content-Type":"application/json",
+			"Email": username,
+			"Password": hashedPassword,
+		}
+
+		valsConfirmer := PushConfirmer{Name:dirname,Shared:shared}
+		jsonvals,_ = json.Marshal(valsConfirmer)
+
+		//Perform Post and receive URL
+		resp, err = req.Post(endpoint, req.BodyJSON(jsonvals),header)
+		respCode = resp.Response().StatusCode
+		if err!=nil{
+			resp, err = req.Post(endpoint, req.BodyJSON(jsonvals),header)
+			if err!=nil{
+				unexpected_event()
+			}
+		}
+		if respCode!=225{
+
+			resp, err = req.Post(endpoint, req.BodyJSON(jsonvals),header)
+			if err!=nil{
+				resp, err = req.Post(endpoint, req.BodyJSON(jsonvals),header)
+				if err!=nil{
+					unexpected_event()
+				}
+			}
+
+
+		}
+
+		fmt.Println(dirname+" uploaded successfully.")
+
+		
 		
 	}
 
