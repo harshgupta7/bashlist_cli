@@ -19,6 +19,7 @@ func main(){
 	//delete_secret("Bashlist-Credentials/Credentials")
 	//delete_secret("Bashlist-Credentials/Safe-Credentials")
 	upload_handler("swcli")
+	//fmt.Print(get_size("swcli"))
 	//test_post()
 	//var desc string
 	//fmt.Print("Description (Press Enter to Leave Blank): ")

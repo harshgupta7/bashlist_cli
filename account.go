@@ -12,10 +12,8 @@ import (
 func get_account_url()(string){
 	/* Fetches unique account url*/
 	endpoint := URL + GET_ACCOUNT_URL_ENDPOINT
-	usernamePtr, passwordPtr, err:=authHandler(0)
-	if err!=nil {
-		color.Red("Authentication Error! Please try again later")
-	}
+	usernamePtr, passwordPtr, _:=authHandler(0)
+
 	username := *usernamePtr
 	hashedPassword := *passwordPtr
 	r := req.New()

@@ -12,13 +12,8 @@ import (
 	//"bufio"
 	"github.com/buger/jsonparser"
 	"bufio"
-	//"net/http"
-	//"bytes"
-	"bytes"
-	"io"
-	"log"
-	"mime/multipart"
-	"net/http"
+
+
 )
 
 type PushURLRequester struct{
@@ -39,134 +34,6 @@ func unexpected_event(){
 	os.Exit(1)
 }
 
-func upload_bucket(encrypted_bytes *[]byte, resp *[]byte, dirname string){
-
-	aws_url,err := jsonparser.GetString(*resp,"URL","url")
-	if err!=nil{
-		unexpected_event()
-	}
-
-	file := bytes.NewReader(*encrypted_bytes)
-	// Buffer to store our request body as bytes
-	var requestBody bytes.Buffer
-	// Create a multipart writer
-	multiPartWriter := multipart.NewWriter(&requestBody)
-
-	// Initialize the file field
-	fileWriter, err := multiPartWriter.CreateFormFile("file_field", dirname)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	// Copy the actual file content to the field field's writer
-	_, err = io.Copy(fileWriter, file)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	paramFields,_,_,err1 := jsonparser.Get(*resp,"URL","fields")
-	if err1!=nil{
-		unexpected_event()
-	}
-	fieldacl,err2 := jsonparser.GetString(paramFields,"acl")
-	if err2!=nil{
-		unexpected_event()
-	}
-	fieldKey,err2 := jsonparser.GetString(paramFields,"key")
-	if err2!=nil{
-		unexpected_event()
-	}
-	fieldAWSAccessKeyId,err2 := jsonparser.GetString(paramFields,"AWSAccessKeyId")
-	if err2!=nil{
-		unexpected_event()
-	}
-	fieldPolicy,err2 := jsonparser.GetString(paramFields,"policy")
-	if err2!=nil{
-		unexpected_event()
-	}
-	fieldSignature,err2 := jsonparser.GetString(paramFields,"signature")
-	if err2!=nil{
-		unexpected_event()
-	}
-
-	err = multiPartWriter.WriteField("acl",fieldacl)
-	if err!=nil{
-		unexpected_event()
-	}
-	err = multiPartWriter.WriteField("key",fieldKey)
-	if err!=nil{
-		unexpected_event()
-	}
-	err = multiPartWriter.WriteField("AWSAccessKeyId",fieldAWSAccessKeyId)
-	if err!=nil{
-		unexpected_event()
-	}
-	err = multiPartWriter.WriteField("policy",fieldPolicy)
-	if err!=nil{
-		unexpected_event()
-	}
-	err = multiPartWriter.WriteField("signature",fieldSignature)
-	if err!=nil{
-		unexpected_event()
-	}
-
-	// Populate other fields
-	fieldWriter, err := multiPartWriter.CreateFormField("normal_field")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	_, err = fieldWriter.Write([]byte("Value"))
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-
-	multiPartWriter.Close()
-
-	// By now our original request body should have been populated, so let's just use it with our custom request
-	req_, err := http.NewRequest("POST", aws_url, &requestBody)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	// We need to set the content type from the writer, it includes necessary boundary as well
-	req_.Header.Set("Content-Type", multiPartWriter.FormDataContentType())
-
-	// Do the request
-	client := &http.Client{}
-	fmt.Println(req_)
-	response, err := client.Do(req_)
-	if err != nil {
-		log.Fatalln(err)
-		fmt.Println("haha")
-	}
-
-	fmt.Println(response)
-}
-
-func test_post(){
-
-	b := PushURLRequester{Size:string(312312),Name:"gagamama"}
-
-	mmd, _ := json.Marshal(b)
-	d,f,_ :=authHandler(0)
-	header := req.Header{
-		"Content-Type":"application/json",
-		"Email": *d,
-		"Password":*f,
-	}
-
-	//loc:=URL
-	endpoint:=URL+PUSH_BUCKET_REQ
-
-	resp, err := req.Post(endpoint, req.BodyJSON(mmd),header)
-	if err != nil {
-		//return "SSD12"
-		fmt.Print("AS")
-	}
-	fmt.Println(resp)
-	//return resp.String()
-
-
-}
 
 
 
@@ -175,7 +42,7 @@ func upload_handler(dirname string) {
 
 
 	//Fetch username and password
-	usernamePtr, passwordPtr,err:=authHandler(0)
+	usernamePtr, passwordPtr,_:=authHandler(0)
 
 	//Allocate byte array for compressed directory
 	var comp_bytes *[]byte
@@ -202,6 +69,7 @@ func upload_handler(dirname string) {
 
 	//Get Size
 	size,err := get_size(dirname)
+	size = size/1000 //Convert from bytes to KB
 	if err!=nil{
 		color.Red("Bashlist encountered an unexpected error. Please try again later.")
 		os.Exit(1)
@@ -255,7 +123,10 @@ func upload_handler(dirname string) {
 			"Email":    username,
 			"Password": hashedPassword,
 		}
-		resp, err = req.Post(endpoint, header, req.BodyJSON(jsonvals))
+		resp, err1 := req.Post(endpoint, header, req.BodyJSON(jsonvals))
+		if err1!=nil{
+			unexpected_event()
+		}
 		respCode = resp.Response().StatusCode
 		//Technically should never happen,as U/P values are saved after auth_check with server.
 		if respCode == 403 {
@@ -408,27 +279,34 @@ func upload_handler(dirname string) {
 
 		//upload_bucket(encrypted_bytes,&byteResp,dirname)
 		//prepareFields(&byteResp)
-		//d,_,_,_ := jsonparser.Get(byteResp,"URL","fields")
+		d,_,_,_ := jsonparser.Get(byteResp,"URL","fields")
+		//fmt.Println(string(d))
+		//two_upload(&d)
+		uurl ,_:=jsonparser.GetString(byteResp,"URL","url")
+		prepare_config(&d,encrypted_bytes,uurl)
+		//three_upload(&d)
+		//mainner(&d)
 		//c:=FieldsCreator(&d)
-		fmt.Println(string(byteResp))
-		u,_ := jsonparser.GetString(byteResp,"URL")
-		//f := io.Reader("config.go")
-		ff,_ := os.Open("config.go")
-		req_, err := http.NewRequest("PUT", u,ff)
-		fmt.Println(req_)
-		if err != nil {
-			fmt.Println("error creating request", u)
-			return
-		}
-		req_.ContentLength = 280
-		resp, err := http.DefaultClient.Do(req_)
-		if err != nil {
-			fmt.Println(err)
-			fmt.Println("Asdasdasdsadadad")
-			return
-
-		}
-		fmt.Println(resp)
+		//fmt.Println(string(byteResp))
+		//u,_ := jsonparser.GetString(byteResp,"URL")
+		////f := io.Reader("config.go")
+		//ff,_ := os.Open("config.go")
+		//req_, err := http.NewRequest("PUT", u,ff)
+		//fmt.Println(req_)
+		//if err != nil {
+		//	fmt.Println("error creating request", u)
+		//	return
+		//}
+		//req_.ContentLength = 280
+		//resp, err := http.DefaultClient.Do(req_)
+		//if err != nil {
+		//	fmt.Println(err)
+		//	fmt.Println("Asdasdasdsadadad")
+		//	return
+		//
+		//}
+		//fmt.Println(resp)
+		// run(encrypted_bytes)
 
 	}
 

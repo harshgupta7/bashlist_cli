@@ -67,7 +67,7 @@ func delete_secret(url string){
 
 
 
-func incorrect_auth_loop() {
+func incorrect_auth_loop() (*string,*string,*string){
 	/* Infinite Loop that runs till users enters a wrong username/password combination*/
 	endpoint := URL + TEST_AUTH_ENDPOINT
 	for {
@@ -95,9 +95,16 @@ func incorrect_auth_loop() {
 				continue
 			}
 			if response=="T"{
+
+				color.Cyan("Do you wish to save your credentials on this machine? [Y/n]")
+				var response string
+				fmt.Scanln(&response)
+				if response == "n" || response == "N" || response == "No" || response == "no" {
+					return usernamePtr,passwordPtr,realPassPtr
+				}
 				save_secret("Bashlist-Credentials/Credentials",usernamePtr,passwordPtr)
 				save_secret("Bashlist-Credentials/Safe-Credentials",usernamePtr,realPassPtr)
-				return
+				return usernamePtr,passwordPtr,realPassPtr
 			}else{
 				continue
 			}
@@ -113,19 +120,18 @@ func change_password(){
 
 }
 
-func authHandler(incorrect int)(*string,*string,error){
+func authHandler(incorrect int)(*string,*string,*string){
 	if incorrect==0 {
 		usernamePtr, passwordPtr, err := retreive_secret("Bashlist-Credentials/Credentials")
-		if err != nil {
-			incorrect_auth_loop()
-			usernamePtr, passwordPtr, err = retreive_secret("Bashlist-Credentials/Credentials")
-			return usernamePtr, passwordPtr, err
-		}
-		return usernamePtr, passwordPtr, err
-	} else{
-		incorrect_auth_loop()
-		usernamePtr, passwordPtr, err := retreive_secret("Bashlist-Credentials/Credentials")
-		return usernamePtr, passwordPtr, err
+		usernamePtr, realPassPtr, err1 := retreive_secret("Bashlist-Credentials/Safe-Credentials")
 
+		if err != nil || err1!=nil{
+			usernamePtr,passwordPtr,realPassPtr := incorrect_auth_loop()
+			return usernamePtr, passwordPtr, realPassPtr
+		}
+		return usernamePtr, passwordPtr, realPassPtr
+	} else{
+		usernamePtr,passwordPtr,realPassPtr := incorrect_auth_loop()
+		return usernamePtr, passwordPtr, realPassPtr
 	}
 }

@@ -21,10 +21,8 @@ type BLObject struct {
 
 func print_list(){
 	endpoint := URL + BASHLIST_LIST_URL
-	usernamePtr, passwordPtr, err:=authHandler(0)
-	if err!=nil {
-		color.Red("Authentication Error! Please try again later")
-	}
+	usernamePtr, passwordPtr, _:=authHandler(0)
+
 	username := *usernamePtr
 	hashedPassword := *passwordPtr
 	r := req.New()

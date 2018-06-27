@@ -10,10 +10,17 @@ import "path/filepath"
 import (
 	"errors"
 	"github.com/fatih/color"
+	"log"
 )
 
 
-
+func get_code_path()(string){
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+    if err != nil {
+            log.Fatal(err)
+    }
+    return dir
+}
 
 func generate_random_string(length int)(string,error){
 
