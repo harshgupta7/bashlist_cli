@@ -2,14 +2,11 @@ package main
 
 import (
 	"github.com/imroc/req"
-	//"time"
 	"fmt"
 	"encoding/json"
 	"github.com/fatih/color"
 	"os"
-
 	"strconv"
-	//"bufio"
 	"github.com/buger/jsonparser"
 	"bufio"
 
@@ -275,39 +272,12 @@ func upload_handler(dirname string) {
 		}
 		fmt.Println(desc)
 
-		//r := bytes.NewReader(*encrypted_bytes)
-
-		//upload_bucket(encrypted_bytes,&byteResp,dirname)
-		//prepareFields(&byteResp)
+		
 		d,_,_,_ := jsonparser.Get(byteResp,"URL","fields")
-		//fmt.Println(string(d))
-		//two_upload(&d)
+	
 		uurl ,_:=jsonparser.GetString(byteResp,"URL","url")
-		prepare_config(&d,encrypted_bytes,uurl)
-		//three_upload(&d)
-		//mainner(&d)
-		//c:=FieldsCreator(&d)
-		//fmt.Println(string(byteResp))
-		//u,_ := jsonparser.GetString(byteResp,"URL")
-		////f := io.Reader("config.go")
-		//ff,_ := os.Open("config.go")
-		//req_, err := http.NewRequest("PUT", u,ff)
-		//fmt.Println(req_)
-		//if err != nil {
-		//	fmt.Println("error creating request", u)
-		//	return
-		//}
-		//req_.ContentLength = 280
-		//resp, err := http.DefaultClient.Do(req_)
-		//if err != nil {
-		//	fmt.Println(err)
-		//	fmt.Println("Asdasdasdsadadad")
-		//	return
-		//
-		//}
-		//fmt.Println(resp)
-		// run(encrypted_bytes)
-
+		upload_helper(&d,encrypted_bytes,uurl)
+		
 	}
 
 

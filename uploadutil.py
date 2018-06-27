@@ -19,4 +19,6 @@ inputDict['policy'] = config.get('default','policy')
 inputDict['x-amz-signature'] = config.get('default','x-amz-signature')
 files = {'file': open(config.get('default','encfile'), 'rb')}
 resp = requests.post(url=config.get('default','url'), data=inputDict,files=files)
-print(resp.text)
+print(resp.status_code)
+
+

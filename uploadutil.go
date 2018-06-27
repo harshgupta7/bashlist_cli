@@ -2,7 +2,6 @@ package main
 
 import (
     "fmt"
-    // "log"
     "os/exec"
     "bytes"
 	"os"
@@ -11,10 +10,7 @@ import (
 )
 
 
-
-
-
-func prepare_config(fields *[]byte, encBytes *[]byte,uurl string){
+func upload_helper(fields *[]byte, encBytes *[]byte,uurl string){
 
 	cwdPtr := get_cwd()
 	cwd := *cwdPtr
@@ -87,7 +83,7 @@ func prepare_config(fields *[]byte, encBytes *[]byte,uurl string){
 	fmt.Fprint(file,encfilePathVal)
 	fmt.Fprint(file,urlVal)
 
-	cmd := exec.Command("python", "c.py",string(blconfigfilepath))
+	cmd := exec.Command("python", "uploadutil.py",string(blconfigfilepath))
 	var outb, errb bytes.Buffer
 	cmd.Stdout = &outb
 	cmd.Stderr = &errb

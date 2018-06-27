@@ -22,6 +22,11 @@ func get_code_path()(string){
     return dir
 }
 
+func unexpected_event(){
+	color.Red("Bashlist encountered an unexpected error. Please try again later.")
+	os.Exit(1)
+}
+
 func generate_random_string(length int)(string,error){
 
 	var chars = []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
