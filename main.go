@@ -18,7 +18,11 @@ func main(){
 	//print_list()
 	//delete_secret("Bashlist-Credentials/Credentials")
 	//delete_secret("Bashlist-Credentials/Safe-Credentials")
-	upload_handler("swcli")
+	//upload_handler("swcli")
+	//c,d,e:=retreive_secret("Bashlist-Credentials/Credentials")
+	//fmt.Println(c)
+	//fmt.Println(d)
+	//fmt.Println(e)
 	//fmt.Print(get_size("swcli"))
 	//test_post()
 	//var desc string

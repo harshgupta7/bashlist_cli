@@ -83,7 +83,7 @@ func incorrect_auth_loop() (*string,*string,*string){
 		c, err := r.Get(endpoint, authHeader)
 		if err!=nil{
 			fmt.Println("Error contacting server! Please check your connection.")
-			return
+			continue
 		}
 		d := c.Response().StatusCode
 		if d==403{
@@ -124,13 +124,12 @@ func authHandler(incorrect int)(*string,*string,*string){
 	if incorrect==0 {
 		usernamePtr, passwordPtr, err := retreive_secret("Bashlist-Credentials/Credentials")
 		usernamePtr, realPassPtr, err1 := retreive_secret("Bashlist-Credentials/Safe-Credentials")
-
 		if err != nil || err1!=nil{
-			usernamePtr,passwordPtr,realPassPtr := incorrect_auth_loop()
+			usernamePtr, passwordPtr, realPassPtr := incorrect_auth_loop()
 			return usernamePtr, passwordPtr, realPassPtr
 		}
 		return usernamePtr, passwordPtr, realPassPtr
-	} else{
+	}else{
 		usernamePtr,passwordPtr,realPassPtr := incorrect_auth_loop()
 		return usernamePtr, passwordPtr, realPassPtr
 	}

@@ -26,20 +26,13 @@ func encrypt_bucket(){
 	/* Encrypts the bucket*/
 }
 
-func unexpected_event(){
-	color.Red("Bashlist encountered an unexpected error. Please try again later.")
-	os.Exit(1)
-}
-
-
-
 
 func upload_handler(dirname string) {
 	/* Method to manage upload*/
 
 
 	//Fetch username and password
-	usernamePtr, passwordPtr,_:=authHandler(0)
+	usernamePtr, passwordPtr,pass:=authHandler(0)
 
 	//Allocate byte array for compressed directory
 	var comp_bytes *[]byte
@@ -110,7 +103,7 @@ func upload_handler(dirname string) {
 		//Finish Compression
 		comp_bytes = <-conf_comp
 		//Request Fresh Username & Password From AuthHandler
-		usernamePtr, passwordPtr, _ = authHandler(1)
+		usernamePtr, passwordPtr, pass = authHandler(1)
 
 		//Retrieve u/p values
 		username = *usernamePtr
@@ -162,20 +155,7 @@ func upload_handler(dirname string) {
 			color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
 			return
 		}
-		//Retrieve password to unlock file encryption ket
-		_, pass, err := retreive_secret("Bashlist-Credentials/Safe-Credentials")
-		//Technically should never happen as password and auth password get saved together
-		if err != nil {
-			<-conf_comp
-			//Make user save secrets again
-			authHandler(1)
-			_, pass, err = retreive_secret("Bashlist-Credentials/Safe-Credentials")
-			//This should really never happen
-			if err!=nil{
-				color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
-				return
-			}
-		}
+
 
 		//Get whether directory is shared or not
 		shared,err := jsonparser.GetString(byteResp,"Shared")
