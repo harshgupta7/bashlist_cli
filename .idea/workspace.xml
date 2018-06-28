@@ -2,13 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b85ee43d-60fe-40b6-bf21-c670f51cb0f1" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.bashlistuploadconfig.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.encontents.bls" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.bashlistuploadconfig.txt" beforeDir="false" afterPath="$PROJECT_DIR$/.bashlistuploadconfig.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.encontents.bls" beforeDir="false" afterPath="$PROJECT_DIR$/.encontents.bls" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/account" beforeDir="false" afterPath="$PROJECT_DIR$/account" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/downloader.go" beforeDir="false" afterPath="$PROJECT_DIR$/downloader.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/uploader.go" beforeDir="false" afterPath="$PROJECT_DIR$/uploader.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uploadutil.go" beforeDir="false" afterPath="$PROJECT_DIR$/uploadutil.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils.go" beforeDir="false" afterPath="$PROJECT_DIR$/utils.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -19,14 +20,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="uploader.go" pinned="false" current-in-tab="true">
+      <file leaf-file-name="uploader.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/uploader.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="790">
-              <caret line="294" lean-forward="true" selection-start-line="294" selection-end-line="294" />
+            <state relative-caret-position="233">
+              <caret line="51" column="35" selection-start-line="51" selection-start-column="4" selection-end-line="51" selection-end-column="35" />
               <folding>
                 <element signature="e#14#157#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="downloader.go" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/downloader.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="90">
+              <caret line="6" selection-start-line="6" selection-end-line="6" />
             </state>
           </provider>
         </entry>
@@ -38,11 +48,6 @@
               <caret line="98" column="12" selection-start-line="98" selection-start-column="12" selection-end-line="98" selection-end-column="12" />
             </state>
           </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="share.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/share.go">
-          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
       <file leaf-file-name="authentication-mac.go" pinned="false" current-in-tab="false">
@@ -57,8 +62,8 @@
       <file leaf-file-name="config.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/config.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="7" column="43" selection-start-line="7" selection-start-column="43" selection-end-line="7" selection-end-column="43" />
+            <state relative-caret-position="135">
+              <caret line="9" selection-start-line="9" selection-end-line="9" />
             </state>
           </provider>
         </entry>
@@ -66,8 +71,11 @@
       <file leaf-file-name="main.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="690">
-              <caret line="46" column="25" selection-start-line="46" selection-start-column="25" selection-end-line="46" selection-end-column="25" />
+            <state relative-caret-position="621">
+              <caret line="64" column="7" selection-start-line="64" selection-start-column="7" selection-end-line="64" selection-end-column="7" />
+              <folding>
+                <element signature="e#14#37#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -75,8 +83,8 @@
       <file leaf-file-name="utils.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/utils.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="738">
-              <caret line="175" column="3" selection-start-line="139" selection-start-column="2" selection-end-line="175" selection-end-column="3" />
+            <state relative-caret-position="2670">
+              <caret line="178" column="61" selection-start-line="178" selection-start-column="44" selection-end-line="178" selection-end-column="61" />
               <folding>
                 <element signature="e#15#251#0" expanded="true" />
               </folding>
@@ -87,8 +95,8 @@
       <file leaf-file-name="list.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/list.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1230">
-              <caret line="82" column="5" selection-start-line="82" selection-start-column="5" selection-end-line="82" selection-end-column="5" />
+            <state relative-caret-position="576">
+              <caret line="59" column="18" selection-start-line="57" selection-start-column="12" selection-end-line="59" selection-end-column="18" />
               <folding>
                 <element signature="e#14#173#0" expanded="true" />
               </folding>
@@ -99,8 +107,8 @@
       <file leaf-file-name="account.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/account.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-69">
-              <caret line="2" column="7" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
+            <state relative-caret-position="450">
+              <caret line="30" column="5" selection-start-line="30" selection-start-column="5" selection-end-line="30" selection-end-column="5" />
               <folding>
                 <element signature="e#14#161#0" expanded="true" />
               </folding>
@@ -111,8 +119,8 @@
       <file leaf-file-name="encryption.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/encryption.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3795">
-              <caret line="253" selection-start-line="253" selection-end-line="253" />
+            <state relative-caret-position="991">
+              <caret line="135" column="33" selection-start-line="135" selection-start-column="5" selection-end-line="135" selection-end-column="33" />
               <folding>
                 <element signature="e#14#301#0" expanded="true" />
               </folding>
@@ -161,12 +169,13 @@
         <option value="$PROJECT_DIR$/c.py" />
         <option value="$PROJECT_DIR$/account.go" />
         <option value="$PROJECT_DIR$/list.go" />
-        <option value="$PROJECT_DIR$/config.go" />
         <option value="$PROJECT_DIR$/authentication-mac.go" />
+        <option value="$PROJECT_DIR$/uploadutil.go" />
+        <option value="$PROJECT_DIR$/config.go" />
+        <option value="$PROJECT_DIR$/uploader.go" />
         <option value="$PROJECT_DIR$/utils.go" />
         <option value="$PROJECT_DIR$/main.go" />
-        <option value="$PROJECT_DIR$/uploadutil.go" />
-        <option value="$PROJECT_DIR$/uploader.go" />
+        <option value="$PROJECT_DIR$/downloader.go" />
       </list>
     </option>
   </component>
@@ -471,13 +480,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/downloader.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="795">
-          <caret line="53" selection-start-line="53" selection-end-line="53" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.encontents.bls" />
     <entry file="file://$PROJECT_DIR$/t.go" />
     <entry file="file://$PROJECT_DIR$/c.py" />
@@ -489,64 +491,27 @@
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/fileWriter.go" />
-    <entry file="file://$PROJECT_DIR$/list.go">
+    <entry file="file://$PROJECT_DIR$/authentication-mac.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1230">
-          <caret line="82" column="5" selection-start-line="82" selection-start-column="5" selection-end-line="82" selection-end-column="5" />
-          <folding>
-            <element signature="e#14#173#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="-1014">
+          <caret line="10" column="33" selection-start-line="10" selection-start-column="33" selection-end-line="10" selection-end-column="33" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/config.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="43" selection-start-line="7" selection-start-column="43" selection-end-line="7" selection-end-column="43" />
+        <state relative-caret-position="135">
+          <caret line="9" selection-start-line="9" selection-end-line="9" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/encryption.go">
+    <entry file="file://$PROJECT_DIR$/list.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3795">
-          <caret line="253" selection-start-line="253" selection-end-line="253" />
+        <state relative-caret-position="576">
+          <caret line="59" column="18" selection-start-line="57" selection-start-column="12" selection-end-line="59" selection-end-column="18" />
           <folding>
-            <element signature="e#14#301#0" expanded="true" />
+            <element signature="e#14#173#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/utils.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="738">
-          <caret line="175" column="3" selection-start-line="139" selection-start-column="2" selection-end-line="175" selection-end-column="3" />
-          <folding>
-            <element signature="e#15#251#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/account.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-69">
-          <caret line="2" column="7" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
-          <folding>
-            <element signature="e#14#161#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="690">
-          <caret line="46" column="25" selection-start-line="46" selection-start-column="25" selection-end-line="46" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/authentication-mac.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1014">
-          <caret line="10" column="33" selection-start-line="10" selection-start-column="33" selection-end-line="10" selection-end-column="33" />
         </state>
       </provider>
     </entry>
@@ -557,13 +522,60 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/account.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="30" column="5" selection-start-line="30" selection-start-column="5" selection-end-line="30" selection-end-column="5" />
+          <folding>
+            <element signature="e#14#161#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/uploader.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="790">
-          <caret line="294" lean-forward="true" selection-start-line="294" selection-end-line="294" />
+        <state relative-caret-position="233">
+          <caret line="51" column="35" selection-start-line="51" selection-start-column="4" selection-end-line="51" selection-end-column="35" />
           <folding>
             <element signature="e#14#157#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utils.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2670">
+          <caret line="178" column="61" selection-start-line="178" selection-start-column="44" selection-end-line="178" selection-end-column="61" />
+          <folding>
+            <element signature="e#15#251#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/encryption.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="991">
+          <caret line="135" column="33" selection-start-line="135" selection-start-column="5" selection-end-line="135" selection-end-column="33" />
+          <folding>
+            <element signature="e#14#301#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="621">
+          <caret line="64" column="7" selection-start-line="64" selection-start-column="7" selection-end-line="64" selection-end-column="7" />
+          <folding>
+            <element signature="e#14#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/downloader.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" selection-start-line="6" selection-end-line="6" />
         </state>
       </provider>
     </entry>

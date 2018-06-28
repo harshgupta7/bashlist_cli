@@ -21,7 +21,7 @@ type PushURLRequester struct{
 type PushConfirmer struct{
 	Name string
 	Shared string
-	Description string
+	BLDESC string
 }
 
 func upload_handler(dirname string) {
@@ -38,7 +38,7 @@ func upload_handler(dirname string) {
 	endpoint := URL + PUSH_BUCKET_REQ
 
 	//Check if directory Exists
-	ex := directory_exists(dirname)
+	ex := directory_exists(dirname,"push")
 	//No Directory Exists Return
 	if ex==false{
 		return
@@ -262,7 +262,7 @@ func upload_handler(dirname string) {
 			"Password": hashedPassword,
 		}
 
-		valsConfirmer := PushConfirmer{Name:dirname,Shared:shared,Description:desc}
+		valsConfirmer := PushConfirmer{Name:dirname,Shared:shared,BLDESC:desc}
 		jsonvals,_ = json.Marshal(valsConfirmer)
 		endpoint = URL + PUSH_BUCKET_CONF
 

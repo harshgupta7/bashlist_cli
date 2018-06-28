@@ -1,5 +1,9 @@
 package main
 
+import (
+	//"fmt"
+)
+
 func main(){
 	/*Main function*/
 	// c,_:=get_size("django")
@@ -44,9 +48,33 @@ func main(){
 	//c,d:=hashDir("swcli")
 	//fmt.Println(c)
 	//fmt.Println(d)
-	upload_handler("swcli")
+	//upload_handler("swcli")
 	//520d1d47ca095287df3aa069ac987da0
+	//c := get_download_url("swcli")
+	//fmt.Println(string(c))
+	//d := get_download_url("kkr")
+	//fmt.Println(string(d))
+	//c := make(chan,)
+	//dir_to_compressed_bytes
+	//fmt.Println(len(*c))
+	//byteToFile(c)
 
+	//inFile, err := os.Open("Test.zip")
+	//if err != nil {
+	//	fmt.Println("aa")
+	//}
+	//defer func() {
+	//	_ = inFile.Close()
+	//}()
+
+	//inFileInfo, err := inFile.Stat()
+	//if err != nil {
+	//	fmt.Println("aa")
+	//}
+	//inFileSize := inFileInfo.Size()
+	//
+	//fmt.Println(inFileSize)
+	download_manager("swcli")
 }
 
 

@@ -76,26 +76,27 @@ func IsDirectory(path string) (bool, error) {
 }
 
 
-func directory_exists(dirname string)(bool){
+func directory_exists(dirname string, context string)(bool){
 	/*Checks whether a directory exists in the cwd or not*/
 	cwd_address := get_cwd()
 	cwd := *cwd_address
 	path := cwd+"/"+dirname
 	exists,err:=object_exists(path)
 	if err!=nil{
-		color.Red("An Unexpected Error Occurred.Please Try Again Later")
-		os.Exit(1)
+		unexpected_event()
 	}
-	if !exists{
+	if !exists && context=="pull"{
+		return true
+	}
+	if !exists && context=="push"{
 		fmt.Println(dirname+": No such file or directory")
 		return false
 	}
 	isDir,dirErr := IsDirectory(path)
 	if dirErr!=nil{
-		color.Red("An Unexpected Error Occurred.Please Try Again Later")
-		os.Exit(1)
+		unexpected_event()
 	}
-	if !isDir{
+	if !isDir && context=="push"{
 		fmt.Println(dirname+": Not a directory. Only directories can be pushed to bashlist.")
 		fmt.Println("Place "+dirname+" inside a directory to push.")
 		return false
