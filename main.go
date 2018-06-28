@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 func main(){
 	/*Main function*/
 	// c,_:=get_size("django")
@@ -43,9 +41,10 @@ func main(){
 	//c := <-conf_comp
 	//d := hashByte(c)
 	//fmt.Println(d)
-	c,d:=hashDir("swcli")
-	fmt.Println(c)
-	fmt.Println(d)
+	//c,d:=hashDir("swcli")
+	//fmt.Println(c)
+	//fmt.Println(d)
+	upload_handler("swcli")
 	//520d1d47ca095287df3aa069ac987da0
 
 }

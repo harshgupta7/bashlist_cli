@@ -24,15 +24,6 @@ type PushConfirmer struct{
 	Description string
 }
 
-func get_upload_url(){
-	/* Gets upload url*/
-}
-
-func encrypt_bucket(){
-	/* Encrypts the bucket*/
-}
-
-
 func upload_handler(dirname string) {
 	/* Method to manage upload*/
 
@@ -257,11 +248,12 @@ func upload_handler(dirname string) {
 			return
 		}
 
-		d,_,_,_ := jsonparser.Get(byteResp,"URL","fields")
-	
+		awsFields,_,_,_ := jsonparser.Get(byteResp,"URL","fields")
 		uurl ,_:=jsonparser.GetString(byteResp,"URL","url")
-		upload_helper(&d,encrypted_bytes,uurl)
-
+		conf := upload_helper(&awsFields,encrypted_bytes,uurl)
+		if conf!=1{
+			unexpected_event()
+		}
 
 		//send confirmation
 		header = req.Header{

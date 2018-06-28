@@ -7,10 +7,11 @@ import (
 	"os"
 	"github.com/buger/jsonparser"
 	"io/ioutil"
+	"strings"
 )
 
 
-func upload_helper(fields *[]byte, encBytes *[]byte,uurl string){
+func upload_helper(fields *[]byte, encBytes *[]byte,uurl string)int{
 
 	cwdPtr := get_cwd()
 	cwd := *cwdPtr
@@ -89,12 +90,15 @@ func upload_helper(fields *[]byte, encBytes *[]byte,uurl string){
 	cmd.Stderr = &errb
 	err = cmd.Run()
 	if err != nil {
-		// log.Fatal(err)
-		fmt.Println("Bashlist encountered an unexpected error while executing push.")
-		// log.Fatal(err)
+		unexpected_event()
 	}
-	fmt.Println("jaja")
-	fmt.Println("out:", outb.String(), "err:", errb.String())
+	statusCode := strings.TrimSpace(outb.String())
+	if statusCode!="204"{
+		unexpected_event()
+	}
+	return 1
+
+
 
 
 }
