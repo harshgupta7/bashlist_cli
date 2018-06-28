@@ -14,7 +14,6 @@ import (
 
 var nativeStore = osxkeychain.Osxkeychain{}
 
-
 func get_username_password()(*string,*string,*string){
 	/*Shows a prompt to enter username and password and returns them*/
 
@@ -96,7 +95,7 @@ func incorrect_auth_loop() (*string,*string,*string){
 			}
 			if response=="T"{
 
-				color.Cyan("Do you wish to save your credentials on this machine? [Y/n]")
+				color.Cyan("Do you wish to save your credentials on this machine? [Y/n] ")
 				var response string
 				fmt.Scanln(&response)
 				if response == "n" || response == "N" || response == "No" || response == "no" {

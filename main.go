@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 func main(){
 	/*Main function*/
 	// c,_:=get_size("django")
@@ -18,7 +20,7 @@ func main(){
 	//print_list()
 	//delete_secret("Bashlist-Credentials/Credentials")
 	//delete_secret("Bashlist-Credentials/Safe-Credentials")
-	upload_handler("swcli")
+	//upload_handler("swcli")
 	//c,d,e:=retreive_secret("Bashlist-Credentials/Credentials")
 	//fmt.Println(c)
 	//fmt.Println(d)
@@ -33,7 +35,18 @@ func main(){
 	//	break
 	//}
 	//fmt.Println(desc)
+	//conf_comp := make(chan *[]byte)
 
+	//Initiate goroutine
+	//go dir_to_compressed_bytes("swcli",conf_comp)
+	//
+	//c := <-conf_comp
+	//d := hashByte(c)
+	//fmt.Println(d)
+	c,d:=hashDir("swcli")
+	fmt.Println(c)
+	fmt.Println(d)
+	//520d1d47ca095287df3aa069ac987da0
 
 }
 

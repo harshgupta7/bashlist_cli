@@ -21,6 +21,7 @@ type PushURLRequester struct{
 type PushConfirmer struct{
 	Name string
 	Shared string
+	Description string
 }
 
 func get_upload_url(){
@@ -226,7 +227,7 @@ func upload_handler(dirname string) {
 		if exists=="Y"{
 			if shared=="N" {
 				fmt.Print("A Directory " + dirname + " already exists in your bashlist. Pushing will update its contents. " +
-					"Do you want to continue?[Y/n]")
+					"Do you want to continue?[Y/n] ")
 				var response string
 				fmt.Scanln(&response)
 				if response == "n" || response == "N" || response == "No" || response == "no" {
@@ -234,7 +235,7 @@ func upload_handler(dirname string) {
 				}
 			}else{
 				fmt.Print("Directory " + dirname + " already exists and is a shared directory. Pushing will update its contents for all members. " +
-					"Do you want to continue?[Y/n]")
+					"Do you want to continue?[Y/n] ")
 				var response string
 				fmt.Scanln(&response)
 				if response == "n" || response == "N" || response == "No" || response == "no" {
@@ -255,9 +256,7 @@ func upload_handler(dirname string) {
 			color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
 			return
 		}
-		fmt.Println(desc)
 
-		
 		d,_,_,_ := jsonparser.Get(byteResp,"URL","fields")
 	
 		uurl ,_:=jsonparser.GetString(byteResp,"URL","url")
@@ -271,10 +270,11 @@ func upload_handler(dirname string) {
 			"Password": hashedPassword,
 		}
 
-		valsConfirmer := PushConfirmer{Name:dirname,Shared:shared}
+		valsConfirmer := PushConfirmer{Name:dirname,Shared:shared,Description:desc}
 		jsonvals,_ = json.Marshal(valsConfirmer)
 		endpoint = URL + PUSH_BUCKET_CONF
-		//Perform Post and receive URL
+
+
 		resp, err = req.Post(endpoint, req.BodyJSON(jsonvals),header)
 		respCode = resp.Response().StatusCode
 		if err!=nil{
@@ -293,13 +293,11 @@ func upload_handler(dirname string) {
 				}
 			}
 
+		} else {
+			fmt.Println(dirname+" uploaded successfully.")
 
 		}
 
-		fmt.Println(dirname+" uploaded successfully.")
-
-		
-		
 	}
 
 

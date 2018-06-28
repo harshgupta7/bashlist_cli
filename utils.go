@@ -137,6 +137,44 @@ func get_cwd()*string{
     return &dir
 }
 
+//func hashByte(contentPtr *[]byte)string{
+//
+//	contents := *contentPtr
+//	hasher := md5.New()
+//	hasher.Write(contents)
+//	return hex.EncodeToString(hasher.Sum(nil))
+//
+//	//import (
+//	//	"crypto/md5"
+//	//"encoding/hex"
+//	//)
+//	//
+//	//func GetMD5Hash(text string) string {
+//	//	hasher := md5.New()
+//	//	hasher.Write([]byte(text))
+//	//	return hex.EncodeToString(hasher.Sum(nil))
+//	//}
+//}
+//
+//func hashDir(path string)(string,error){
+//	hash := md5.New()
+//
+//
+//	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+//		if err != nil {
+//			return err
+//		}
+//		io.WriteString(hash, path)
+//		return err
+//	})
+//
+//	if err != nil {
+//		return "",err
+//	}
+//
+//	return fmt.Sprintf("%x", hash.Sum(nil)), nil
+//}
+
 func dir_to_compressed_bytes(dirname string,done chan *[]byte)() {
 	/* Compresses a directory and converts it to byte array*/
 	donesig := color.New(color.FgGreen).SprintFunc()
