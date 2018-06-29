@@ -74,7 +74,7 @@ func main(){
 	//inFileSize := inFileInfo.Size()
 	//
 	//fmt.Println(inFileSize)
-	download_manager("swcli")
+	//download_manager("swcli")
 }
 
 

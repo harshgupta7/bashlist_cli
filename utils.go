@@ -86,22 +86,27 @@ func directory_exists(dirname string, context string)(bool){
 		unexpected_event()
 	}
 	if !exists && context=="pull"{
-		return true
+		return false
 	}
 	if !exists && context=="push"{
-		fmt.Println(dirname+": No such file or directory")
+		color.Cyan(dirname+": No such file or directory")
 		return false
 	}
 	isDir,dirErr := IsDirectory(path)
 	if dirErr!=nil{
 		unexpected_event()
 	}
+	if isDir && context=="pull"{
+		return true
+	}else if !isDir && context=="pull"{
+		return false
+	}
 	if !isDir && context=="push"{
 		fmt.Println(dirname+": Not a directory. Only directories can be pushed to bashlist.")
 		fmt.Println("Place "+dirname+" inside a directory to push.")
 		return false
 	}
-	return true
+	return false
 }
 
 

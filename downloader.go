@@ -126,11 +126,6 @@ func UnencryptContents(enc_contents *[]byte, keyval *[]byte)(*[]byte,error){
 
 }
 
-//func byteToFile(contentsPtr *[]byte){
-//	ioutil.WriteFile("Test.zip",*contentsPtr,0777)
-//}
-
-
 func unzipContents(zippedContents *[]byte,outpath string){
 	donesig := color.New(color.FgGreen).SprintFunc()
 	progress := func(archivePath string) {
@@ -147,27 +142,24 @@ func download_manager(bucketname string){
 	/* Download Manager*/
 
 	resp:= get_download_url(bucketname)
-
 	url,err := jsonparser.GetString(resp,"url")
 	if err!=nil{
 		unexpected_event()
 	}
 	downloadDone := make(chan *[]byte)
 	go download_bucket_to_bytes(url,downloadDone)
-
-
 	exists := directory_exists(bucketname,"pull")
 	if exists==true{
-		msg := "A directory " + bucketname + " already exists. Pulling will overwrite its contents."
+		msg := "A directory " + bucketname + " already exists. Pulling will overwrite its contents." +
+			"Do you want to continue?[Y/n] "
 		color.Cyan(msg)
-		color.Cyan("Do you want to continue?[Y/n] ")
+		//color.Cyan("Do you want to continue?[Y/n] ")
 		var response string
 		fmt.Scanln(&response)
 		if response == "n" || response == "N" || response == "No" || response == "no" {
 			return
 		}
 	}
-
 	sharedVal,err := jsonparser.GetString(resp,"shared")
 	if err!=nil{
 		unexpected_event()
@@ -198,7 +190,7 @@ func download_manager(bucketname string){
 	}
 	cwd := get_cwd()
 	cwdStr := *cwd
-	outpath := cwdStr+"/"+bucketname
+	outpath := cwdStr
 
 	encContents := <-downloadDone
 	contents,err := UnencryptContents(encContents,fileKey)
