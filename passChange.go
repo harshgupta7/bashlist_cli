@@ -4,14 +4,19 @@ import (
 	"github.com/imroc/req"
 	"time"
 	"github.com/buger/jsonparser"
+	"encoding/json"
 )
 
-func get_existing_creds()(*string,*string){
 
+type SecretPoster struct{
+	Password string
+	EncPrivKey string
+	EncFileKey string
+}
+
+func get_existing_creds(usernamePtr *string, passwordPtr *string)(*string,*string){
 
 	endpoint := URL + PULL_BUCKET_ENDPOINT
-	usernamePtr, passwordPtr,_ := authHandler(0)
-
 	r := req.New()
 	authHeader := req.Header{
 		"Email":        *usernamePtr,
@@ -85,11 +90,49 @@ func reencrypt(fileKey *string, privKey *string, oldPassword *string, newPasswor
 
 }
 
-func postUpdated(){
+func postUpdated(usernamePtr *string, passwordPtr *string,newhashedPassword *string, encPrivKey *string, encFileKey *string)int{
+
+	secretVals := SecretPoster{Password:*newhashedPassword,EncFileKey:*encFileKey,EncPrivKey:*encPrivKey}
+	jsonvals,_ := json.Marshal(secretVals)
+	endpoint := URL + POSTCREDS
+	header := req.Header{
+		"Content-Type":"application/json",
+		"Email": *usernamePtr,
+		"Password": *passwordPtr,
+	}
+	resp, err := req.Post(endpoint, req.BodyJSON(jsonvals),header)
+	respCode := resp.Response().StatusCode
+	if err!=nil{
+		resp, err = req.Post(endpoint, req.BodyJSON(jsonvals),header)
+		if err!=nil{
+			unexpected_event()
+		}
+		respCode = resp.Response().StatusCode
+	}
+	if respCode==403{
+		usernamePtr,passwordPtr,_ = authHandler(1)
+		header = req.Header{
+			"Content-Type":"application/json",
+			"Email": *usernamePtr,
+			"Password": *passwordPtr,
+		}
+		resp, err = req.Post(endpoint, req.BodyJSON(jsonvals),header)
+		respCode = resp.Response().StatusCode
+		if respCode==403{
+			unexpected_event()
+		}
+	} else if respCode==399{
+		unexpected_event()
+	} else if respCode==398{
+		return 1
+	}
+	return 0
 
 }
 
 func changePassManager(){
+
+
 
 }
 

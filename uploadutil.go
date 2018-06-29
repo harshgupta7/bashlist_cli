@@ -96,9 +96,12 @@ func upload_helper(fields *[]byte, encBytes *[]byte,uurl string)int{
 	if statusCode!="204"{
 		unexpected_event()
 	}
+	err2:=os.Remove(blconfigfilepath)
+	err1:=os.Remove(filepth)
+	if err2 !=nil || err1 !=nil{
+		return 0
+	}
 	return 1
-
-
 
 
 }
