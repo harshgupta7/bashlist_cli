@@ -8,6 +8,7 @@ import (
 	"github.com/imroc/req"
 	"github.com/pierrre/archivefile/zip"
 	"time"
+	"os"
 )
 
 func get_download_url(bucketname string)[]byte{
@@ -28,6 +29,7 @@ func get_download_url(bucketname string)[]byte{
 		c, err = r.Get(endpoint, authHeader)
 		if err!=nil {
 			color.Red("Error contacting Server. Please check you connection and try again")
+			os.Exit(1)
 		}
 	}
 
@@ -42,15 +44,15 @@ func get_download_url(bucketname string)[]byte{
 		c, err = r.Get(endpoint, authHeader)
 		respCode = c.Response().StatusCode
 		if respCode==403{
-			color.Cyan("Bashlist could not authenticate you at the moment. Please try again.")
-			return nil
+			color.Cyan("Bashlist could not authenticate you. Please try again.")
+			os.Exit(1)
 		}
 	//no bucket available
 	} else if respCode==284 {
 		cyan := color.New(color.FgCyan).SprintFunc()
 		d := color.New(color.FgGreen, color.Bold).SprintFunc()
 		fmt.Printf("%s %s.\n", cyan(": Does not exist. View your available directories using"), d("bashls"))
-		return nil
+		os.Exit(1)
 	//found bucket
 	} else if respCode==285{
 		byteResp, err := c.ToBytes()
@@ -78,15 +80,21 @@ func download_bucket_to_bytes(url string,done chan *[]byte){
 		}
 	}
 
+	if resp.Response().StatusCode!=200{
+		done<-nil
+		close(done)
+		return
+	}
+	//convert response to bytes
 	res,err := resp.ToBytes()
 	if err!=nil{
 		done<-nil
 	}
-
+	//ping channel
 	done<-&res
+	//close channel
 	close(done)
 }
-
 
 func decrypt_private_file_key(enc_key *string)(*[]byte,error){
 
@@ -158,68 +166,86 @@ func unzipContents(zippedContents *[]byte,outpath string){
 }
 
 
-func download_manager(bucketname string){
-	
+func download_manager(bucketname string) {
+
 	/* Download Manager*/
 
-	resp:= get_download_url(bucketname)
-	url,err := jsonparser.GetString(resp,"url")
-	if err!=nil{
+	resp := get_download_url(bucketname)
+	//should never happen
+	if resp == nil {
 		unexpected_event()
 	}
+	//retreive the url value from response
+	url, err := jsonparser.GetString(resp, "url")
+	if err != nil {
+		unexpected_event()
+	}
+
+	//channel for downloaded contents
 	downloadDone := make(chan *[]byte)
-	go download_bucket_to_bytes(url,downloadDone)
-	exists := directory_exists(bucketname,"pull")
-	if exists==true{
-		msg := "A directory " + bucketname + " already exists. Pulling will overwrite its contents." +
-			"Do you want to continue?[Y/n] "
-		color.Cyan(msg)
+	//start downloading
+	go download_bucket_to_bytes(url, downloadDone)
+
+	//check if directory already exists in the current location
+	exists := directory_exists(bucketname, "pull")
+	if exists == true {
+		color.Set(color.FgCyan)
+		fmt.Print("A directory " + bucketname + " already exists. Pulling will overwrite its contents." +
+			"Do you want to continue?[Y/n] ")
+		color.Unset()
 		//color.Cyan("Do you want to continue?[Y/n] ")
 		var response string
-		fmt.Scanln(&response)
+		fmt.Scan(&response)
 		if response == "n" || response == "N" || response == "No" || response == "no" {
 			return
 		}
 	}
-	sharedVal,err := jsonparser.GetString(resp,"shared")
-	if err!=nil{
+	//check if the downloaded directory is shared
+	sharedVal, err := jsonparser.GetString(resp, "shared")
+	if err != nil {
 		unexpected_event()
 	}
+
+	//create filekey slice
 	var fileKey *[]byte
-	if sharedVal=="False"{
-		decKey,err := jsonparser.GetString(resp,"key")
-		if err!=nil{
+	if sharedVal == "False" {
+		decKey, err := jsonparser.GetString(resp, "key")
+		if err != nil {
 			unexpected_event()
 		}
-		fileKey,err = decrypt_private_file_key(&decKey)
-		if err!=nil{
+		fileKey, err = decrypt_private_file_key(&decKey)
+		if err != nil {
 			unexpected_event()
 		}
-	} else{
-		privKey,err := jsonparser.GetString(resp,"unlock_key")
-		if err!=nil{
+	} else {
+		privKey, err := jsonparser.GetString(resp, "unlock_key")
+		if err != nil {
 			unexpected_event()
 		}
-		decKey, err := jsonparser.GetString(resp,"key")
-		if err!=nil{
+		decKey, err := jsonparser.GetString(resp, "key")
+		if err != nil {
 			unexpected_event()
 		}
-		fileKey,err = decrypt_shared_file_key(&privKey,&decKey)
-		if err!=nil{
+		fileKey, err = decrypt_shared_file_key(&privKey, &decKey)
+		if err != nil {
 			unexpected_event()
 		}
 	}
+
 	cwd := get_cwd()
-	cwdStr := *cwd
-	outpath := cwdStr
+	outPath := *cwd
 
 	encContents := <-downloadDone
-	contents,err := UnencryptContents(encContents,fileKey)
-	if err!=nil{
+
+	//Unencrypt data
+	contents, err := UnencryptContents(encContents, fileKey)
+	if err != nil {
 		unexpected_event()
 	}
-	unzipContents(contents,outpath)
 
+	//Unzip and save data
+	unzipContents(contents, outPath)
+	return
 }
 
 

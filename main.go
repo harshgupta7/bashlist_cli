@@ -31,7 +31,8 @@ func main(){
 	//test_post()
 	//var desc string
 	//print_list()
-	get_username_password()
+	//get_username_password()
+	download_manager("swcli")
 	//fmt.Print("Description (Press Enter to Leave Blank): ")
 	//scanner := bufio.NewScanner(os.Stdin)
 	//for scanner.Scan() {
