@@ -69,7 +69,7 @@ func upload_helper(fields *[]byte, encBytes *[]byte,uurl string)int{
 	file,err := os.Create(blconfigfilepath)
 	if err!=nil{
 		//try in different directory
-		fmt.Println("hooha")
+		//fmt.Println("hooha")
 
 	}
 	defer file.Close()
@@ -83,8 +83,8 @@ func upload_helper(fields *[]byte, encBytes *[]byte,uurl string)int{
 	fmt.Fprint(file,xasVal)
 	fmt.Fprint(file,encfilePathVal)
 	fmt.Fprint(file,urlVal)
-
-	cmd := exec.Command("python", "uploadutil.py",string(blconfigfilepath))
+	pypath := get_code_path()+"/"+"uploadutil.py"
+	cmd := exec.Command("python", pypath,string(blconfigfilepath))
 	var outb, errb bytes.Buffer
 	cmd.Stdout = &outb
 	cmd.Stderr = &errb

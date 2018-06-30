@@ -1,9 +1,5 @@
 package main
 
-import (
-	//"fmt"
-)
-
 func main(){
 	/*Main function*/
 	// c,_:=get_size("django")
@@ -32,7 +28,22 @@ func main(){
 	//var desc string
 	//print_list()
 	//get_username_password()
-	download_manager("swcli")
+	//pypath := get_code_path()+"/"+"uploadutil.py"
+	//cmd := exec.Command("python", pypath)
+	//var outb, errb bytes.Buffer
+	//cmd.Stdout = &outb
+	//cmd.Stderr = &errb
+	//err := cmd.Run()
+	//if err != nil {
+	//	unexpected_event()
+	//}
+	//fmt.Print(strings.TrimSpace(outb.String()))
+	//statusCode := strings.TrimSpace(outb.String())
+	//if statusCode!="204"{
+	//	unexpected_event()
+	//}
+	//fmt.Print(cmd)
+	//download_manager("swcli")
 	//fmt.Print("Description (Press Enter to Leave Blank): ")
 	//scanner := bufio.NewScanner(os.Stdin)
 	//for scanner.Scan() {
