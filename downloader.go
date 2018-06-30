@@ -208,6 +208,7 @@ func download_manager(bucketname string) {
 
 	//create filekey slice
 	var fileKey *[]byte
+	//Directory is private
 	if sharedVal == "False" {
 		decKey, err := jsonparser.GetString(resp, "key")
 		if err != nil {
@@ -217,6 +218,7 @@ func download_manager(bucketname string) {
 		if err != nil {
 			unexpected_event()
 		}
+	//Directory is shared
 	} else {
 		privKey, err := jsonparser.GetString(resp, "unlock_key")
 		if err != nil {
