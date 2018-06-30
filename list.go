@@ -8,6 +8,7 @@ import (
 	"os"
 	"encoding/json"
 	"github.com/olekukonko/tablewriter"
+	"fmt"
 )
 
 type BLObject struct {
@@ -61,6 +62,7 @@ func print_list(){
 		} else {
 
 			response, _, _, err := jsonparser.Get(byteResp, "Data")
+			//fmt.Print(string(response))
 			if err != nil {
 				color.Red("An unexpected error occurred! Aborting operation.")
 				return
@@ -70,7 +72,7 @@ func print_list(){
 			json.Unmarshal(response, &keys)
 			table := tablewriter.NewWriter(os.Stdout)
 			table.SetHeader([]string{"Name", "Description", "Size", "Updated", "Status"})
-
+			fmt.Println(keys)
 			for _, obj := range keys {
 				var s []string
 				s = append(s, obj.Name, obj.Description, obj.Size, obj.Updated, obj.Status)

@@ -1,21 +1,26 @@
 package main
 
 import (
-	"github.com/imroc/req"
-	"time"
-	"github.com/buger/jsonparser"
 	"github.com/fatih/color"
+	"github.com/buger/jsonparser"
 	"github.com/skratchdot/open-golang/open"
+	"github.com/imroc/req"
 	"os"
+	"time"
 )
 
 func get_account_url()(string){
-	/* Fetches unique account url*/
-	endpoint := URL + GET_ACCOUNT_URL_ENDPOINT
-	usernamePtr, passwordPtr, _:=authHandler(0)
 
+	/* Fetches unique account url*/
+
+
+	endpoint := URL + GET_ACCOUNT_URL_ENDPOINT
+
+	usernamePtr, passwordPtr, _:=authHandler(0)
 	username := *usernamePtr
 	hashedPassword := *passwordPtr
+
+
 	r := req.New()
 	authHeader := req.Header{
 		"Email":        username,
@@ -29,16 +34,30 @@ func get_account_url()(string){
 			color.Red("Error contacting Server. Please check you connection and try again")
 		}
 	}
-	d := c.Response().StatusCode
-	if d==403{
-		authHandler(1)
-		e := get_account_url()
-		return e
+
+
+	respCode := c.Response().StatusCode
+	if respCode==403{
+		usernamePtr, passwordPtr, _ = authHandler(1)
+		username = *usernamePtr
+		hashedPassword = *passwordPtr
+		authHeader = req.Header{
+			"Email":        username,
+			"Password": hashedPassword,
+		}
+		c, err = r.Get(endpoint, authHeader)
+		if err!=nil{
+			unexpected_event()
+		}
+		respCode = c.Response().StatusCode
+		if respCode==403{
+			unexpected_event()
+		}
 	} else{
 		byteResp, _ := c.ToBytes()
 		response, err := jsonparser.GetString(byteResp, "Url")
 		if err!=nil{
-			color.Red("An unexpected error occurred! Aborting operation.")
+			unexpected_event()
 		}
 		return response
 	}
@@ -57,8 +76,7 @@ func open_account_url(url string ){
 func open_account_handler(){
 	url := get_account_url()
 	if url=="NONE"{
-		color.Red("Bashlist encountered an unexpected error! Please try again later!")
-		return
+		unexpected_event()
 	}
 	open_account_url(url)
 	return
