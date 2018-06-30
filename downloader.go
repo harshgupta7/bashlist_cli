@@ -1,19 +1,20 @@
 package main
 
 import (
-	"github.com/imroc/req"
-	"time"
-	"github.com/fatih/color"
-"github.com/pierrre/archivefile/zip"
-	"fmt"
 	"bytes"
+	"fmt"
 	"github.com/buger/jsonparser"
+	"github.com/fatih/color"
+	"github.com/imroc/req"
+	"github.com/pierrre/archivefile/zip"
+	"time"
 )
 
 func get_download_url(bucketname string)[]byte{
+
 	/* Gets download url for bucket*/
 
-	endpoint := URL + PULL_BUCKET_ENDPOINT+bucketname
+	endpoint := URL + PULL_BUCKET_ENDPOINT + bucketname
 	usernamePtr, passwordPtr,_ := authHandler(0)
 
 	r := req.New()
@@ -29,30 +30,35 @@ func get_download_url(bucketname string)[]byte{
 			color.Red("Error contacting Server. Please check you connection and try again")
 		}
 	}
-	d := c.Response().StatusCode
-	if d==403{
+
+	respCode := c.Response().StatusCode
+	//auth error
+	if respCode==403{
 		usernamePtr, passwordPtr,_ = authHandler(1)
 		authHeader = req.Header{
 			"Email":        *usernamePtr,
 			"Password": *passwordPtr,
 		}
 		c, err = r.Get(endpoint, authHeader)
-		d = c.Response().StatusCode
-		if d==403{
+		respCode = c.Response().StatusCode
+		if respCode==403{
 			color.Cyan("Bashlist could not authenticate you at the moment. Please try again.")
 			return nil
 		}
-
-	} else if d==284 {
-		msg := bucketname + ": Does not exist. View your available directories using bashls."
-		color.Cyan(msg)
+	//no bucket available
+	} else if respCode==284 {
+		cyan := color.New(color.FgCyan).SprintFunc()
+		d := color.New(color.FgGreen, color.Bold).SprintFunc()
+		fmt.Printf("%s %s.\n", cyan(": Does not exist. View your available directories using"), d("bashls"))
 		return nil
-	} else if d==285{
+	//found bucket
+	} else if respCode==285{
 		byteResp, err := c.ToBytes()
 		if err!=nil{
 			unexpected_event()
 		}
 		return byteResp
+	//unexpected
 	} else{
 		unexpected_event()
 	}
@@ -60,7 +66,8 @@ func get_download_url(bucketname string)[]byte{
 }
 
 func download_bucket_to_bytes(url string,done chan *[]byte){
-	/* Downloads bucket*/
+	/* Downloads bucket from s3 to bytes*/
+
 	r := req.New()
 	r.SetTimeout(100 * time.Second)
 	resp,err := r.Get(url)
@@ -70,16 +77,21 @@ func download_bucket_to_bytes(url string,done chan *[]byte){
 			done<-nil
 		}
 	}
+
 	res,err := resp.ToBytes()
 	if err!=nil{
 		done<-nil
 	}
+
 	done<-&res
 	close(done)
 }
 
 
 func decrypt_private_file_key(enc_key *string)(*[]byte,error){
+
+	//Decrypts bucket encryption key using password
+
 	_,_,passwordPtr := authHandler(0)
 	password := *passwordPtr
 	fileKey,err := decrypt_secret(enc_key,password)
@@ -95,6 +107,8 @@ func decrypt_private_file_key(enc_key *string)(*[]byte,error){
 
 
 func decrypt_shared_file_key(encrypted_private_key *string,enc_file_key *string)(*[]byte,error){
+
+	//decrypts shared encryption key using private key and password
 
 	_,_,pass := authHandler(0)
 
@@ -118,6 +132,9 @@ func decrypt_shared_file_key(encrypted_private_key *string,enc_file_key *string)
 }
 
 func UnencryptContents(enc_contents *[]byte, keyval *[]byte)(*[]byte,error){
+
+	//Unencrypt downloaded contents using file key
+
 	contents,err := DecryptObject(enc_contents,keyval)
 	if err!=nil{
 		return nil,err
@@ -127,6 +144,9 @@ func UnencryptContents(enc_contents *[]byte, keyval *[]byte)(*[]byte,error){
 }
 
 func unzipContents(zippedContents *[]byte,outpath string){
+
+	//Unzip contents
+
 	donesig := color.New(color.FgGreen).SprintFunc()
 	progress := func(archivePath string) {
 		fmt.Printf("Receiving: %s....%s\n", archivePath, donesig("OK"))
@@ -139,6 +159,7 @@ func unzipContents(zippedContents *[]byte,outpath string){
 
 
 func download_manager(bucketname string){
+	
 	/* Download Manager*/
 
 	resp:= get_download_url(bucketname)
