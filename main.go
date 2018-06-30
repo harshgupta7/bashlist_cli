@@ -30,7 +30,8 @@ func main(){
 	//fmt.Print(get_size("swcli"))
 	//test_post()
 	//var desc string
-	print_list()
+	//print_list()
+	get_username_password()
 	//fmt.Print("Description (Press Enter to Leave Blank): ")
 	//scanner := bufio.NewScanner(os.Stdin)
 	//for scanner.Scan() {

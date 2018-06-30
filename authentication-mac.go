@@ -1,23 +1,22 @@
 package main
 
-import "fmt"
-import "github.com/fatih/color"
-import "github.com/howeyc/gopass"
-import "github.com/imroc/req"
-import "github.com/docker/docker-credential-helpers/credentials"
-
 import (
+	"fmt"
+	"github.com/docker/docker-credential-helpers/credentials"
 	"github.com/docker/docker-credential-helpers/osxkeychain"
-    "github.com/buger/jsonparser"
+	"github.com/fatih/color"
+	"github.com/howeyc/gopass"
+	"github.com/imroc/req"
+	"github.com/buger/jsonparser"
 	"time"
 )
+
+
 
 var nativeStore = osxkeychain.Osxkeychain{}
 
 func get_username_password()(*string,*string,*string){
 	/*Shows a prompt to enter username and password and returns them*/
-
-	// TODO: VALIDATE STRINGS
 
 	//Ask for Username
 	color.Set(color.FgGreen)
@@ -109,14 +108,6 @@ func incorrect_auth_loop() (*string,*string,*string){
 			}
 		}
 	}
-}
-
-
-
-
-func change_password(){
-	/*password change handler*/
-
 }
 
 func authHandler(incorrect int)(*string,*string,*string){
