@@ -13,9 +13,9 @@ import (
 
 func upload_helper(fields *[]byte, encBytes *[]byte,uurl string)int{
 
-	cwdPtr := get_cwd()
-	cwd := *cwdPtr
-	filepth := cwd+"/"+".encontents.bls"
+	codePath := get_code_path()
+
+	filepth := codePath+"/"+".encontents.bls"
 	content := *encBytes
 	err := ioutil.WriteFile(filepth,content,0777)
 	if err!=nil{
@@ -63,14 +63,12 @@ func upload_helper(fields *[]byte, encBytes *[]byte,uurl string)int{
 
 	urlVal := "url="+uurl+"\n"
 
-	blconfigfilepath := cwd+"/"+".bashlistuploadconfig.txt"
+	blconfigfilepath := codePath+"/"+".bashlistuploadconfig.txt"
 	encfilePathVal := "encfile="+filepth+"\n"
 
 	file,err := os.Create(blconfigfilepath)
 	if err!=nil{
-		//try in different directory
-		//fmt.Println("hooha")
-
+		unexpected_event()
 	}
 	defer file.Close()
 	fmt.Fprintf(file,"[default]\n")
@@ -102,7 +100,6 @@ func upload_helper(fields *[]byte, encBytes *[]byte,uurl string)int{
 		return 0
 	}
 	return 1
-
 
 }
 

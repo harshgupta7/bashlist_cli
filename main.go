@@ -38,6 +38,8 @@ func main(){
 	//	unexpected_event()
 	//}
 	//fmt.Print(strings.TrimSpace(outb.String()))
+	//upload_handler("bashlist_production")
+	download_manager("bashlist_production")
 	//statusCode := strings.TrimSpace(outb.String())
 	//if statusCode!="204"{
 	//	unexpected_event()

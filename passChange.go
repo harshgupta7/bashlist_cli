@@ -131,8 +131,6 @@ func postUpdated(usernamePtr *string, passwordPtr *string,newhashedPassword *str
 }
 
 func changePassManager(){
-
-
-
+	return
 }
 

@@ -11,12 +11,11 @@ import (
 	"os"
 )
 
-func get_download_url(bucketname string)[]byte{
+func get_download_url(bucketname string, usernamePtr *string, passwordPtr *string)[]byte{
 
 	/* Gets download url for bucket*/
 
 	endpoint := URL + PULL_BUCKET_ENDPOINT + bucketname
-	usernamePtr, passwordPtr,_ := authHandler(0)
 
 	r := req.New()
 	authHeader := req.Header{
@@ -96,12 +95,11 @@ func download_bucket_to_bytes(url string,done chan *[]byte){
 	close(done)
 }
 
-func decrypt_private_file_key(enc_key *string)(*[]byte,error){
+func decrypt_private_file_key(enc_key *string,pass *string)(*[]byte,error){
 
 	//Decrypts bucket encryption key using password
 
-	_,_,passwordPtr := authHandler(0)
-	password := *passwordPtr
+	password := *pass
 	fileKey,err := decrypt_secret(enc_key,password)
 	if err!=nil{
 		return nil,err
@@ -114,11 +112,9 @@ func decrypt_private_file_key(enc_key *string)(*[]byte,error){
 
 
 
-func decrypt_shared_file_key(encrypted_private_key *string,enc_file_key *string)(*[]byte,error){
+func decrypt_shared_file_key(encrypted_private_key *string,enc_file_key *string, pass *string)(*[]byte,error){
 
 	//decrypts shared encryption key using private key and password
-
-	_,_,pass := authHandler(0)
 
 	privKeyVal,err := decrypt_secret(encrypted_private_key,*pass)
 	if err!=nil{
@@ -139,9 +135,9 @@ func decrypt_shared_file_key(encrypted_private_key *string,enc_file_key *string)
 
 }
 
-func UnencryptContents(enc_contents *[]byte, keyval *[]byte)(*[]byte,error){
+func DecryptContents(enc_contents *[]byte, keyval *[]byte)(*[]byte,error){
 
-	//Unencrypt downloaded contents using file key
+	//Decrypt downloaded contents using file key
 
 	contents,err := DecryptObject(enc_contents,keyval)
 	if err!=nil{
@@ -169,8 +165,9 @@ func unzipContents(zippedContents *[]byte,outpath string){
 func download_manager(bucketname string) {
 
 	/* Download Manager*/
+	usernamePtr, passwordPtr,pass := authHandler(0)
 
-	resp := get_download_url(bucketname)
+	resp := get_download_url(bucketname, usernamePtr,passwordPtr)
 	//should never happen
 	if resp == nil {
 		unexpected_event()
@@ -214,7 +211,7 @@ func download_manager(bucketname string) {
 		if err != nil {
 			unexpected_event()
 		}
-		fileKey, err = decrypt_private_file_key(&decKey)
+		fileKey, err = decrypt_private_file_key(&decKey,pass)
 		if err != nil {
 			unexpected_event()
 		}
@@ -228,7 +225,7 @@ func download_manager(bucketname string) {
 		if err != nil {
 			unexpected_event()
 		}
-		fileKey, err = decrypt_shared_file_key(&privKey, &decKey)
+		fileKey, err = decrypt_shared_file_key(&privKey, &decKey,pass)
 		if err != nil {
 			unexpected_event()
 		}
@@ -240,7 +237,7 @@ func download_manager(bucketname string) {
 	encContents := <-downloadDone
 
 	//Unencrypt data
-	contents, err := UnencryptContents(encContents, fileKey)
+	contents, err := DecryptContents(encContents, fileKey)
 	if err != nil {
 		unexpected_event()
 	}

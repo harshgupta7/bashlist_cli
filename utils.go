@@ -1,17 +1,16 @@
-package main 
+package main
 
-import "bytes"
-import "crypto/rand"
-import "fmt"
-import "github.com/pierrre/archivefile/zip"
-import "os"
-import "path/filepath"
 import (
-	"errors"
-	"github.com/fatih/color"
+	"path/filepath"
+	"os"
 	"log"
+	"github.com/fatih/color"
+	"fmt"
+	"github.com/pierrre/archivefile/zip"
+	"bytes"
+	"errors"
+	"crypto/rand"
 )
-
 
 func get_code_path()(string){
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
@@ -34,7 +33,7 @@ func generate_random_string(length int)(string,error){
 	}
 	clen := len(chars)
 	if clen < 2 || clen > 256 {
-		return "",errors.New("Insufficient length size")
+		return "",errors.New("Insufficient length size ")
 		
 	}
 	maxrb := 255 - (256 % clen)
@@ -95,7 +94,7 @@ func directory_exists(dirname string, context string)(bool){
 	if dirErr!=nil{
 		unexpected_event()
 	}
-	if isDir && context=="pull"{
+	if isDir{
 		return true
 	}else if !isDir && context=="pull"{
 		return false

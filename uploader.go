@@ -41,6 +41,7 @@ func upload_handler(dirname string) {
 	ex := directory_exists(dirname,"push")
 	//No Directory Exists Return
 	if ex==false{
+		fmt.Print("adad")
 		return
 	}
 
