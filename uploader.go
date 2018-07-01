@@ -11,13 +11,13 @@ import (
 	"bufio"
 )
 
-type PushURLRequester struct{
+type PushURLRequester struct {
 	Size string
 	Name string
 }
 
-type PushConfirmer struct{
-	Name string
+type PushConfirmer struct {
+	Name   string
 	Shared string
 	BLDESC string
 }
@@ -25,9 +25,8 @@ type PushConfirmer struct{
 func upload_handler(dirname string) {
 	/* Method to manage upload*/
 
-
 	//Fetch username and password
-	usernamePtr, passwordPtr,pass:=authHandler(0)
+	usernamePtr, passwordPtr, pass := authHandler(0)
 
 	//Allocate byte array for compressed directory
 	var comp_bytes *[]byte
@@ -36,27 +35,27 @@ func upload_handler(dirname string) {
 	endpoint := URL + PUSH_BUCKET_REQ
 
 	//Check if directory Exists
-	ex := directory_exists(dirname,"push")
+	ex := directory_exists(dirname, "push")
 	//No Directory Exists Return
-	if ex==false{
+	if ex == false {
 		fmt.Print("adad")
 		return
 	}
 
 	//Initiate operation
 	color.Cyan("Initiating Push:")
-	fmt.Println("  - "+ dirname)
+	fmt.Println("  - " + dirname)
 
 	//Channel to receive compressed directory
 	conf_comp := make(chan *[]byte)
 
 	//Initiate goroutine
-	go dir_to_compressed_bytes(dirname,conf_comp)
+	go dir_to_compressed_bytes(dirname, conf_comp)
 
 	//Get Size
-	size,err := get_size(dirname)
-	size = size/1000 //Convert from bytes to KB
-	if err!=nil{
+	size, err := get_size(dirname)
+	size = size / 1000 //Convert from bytes to KB
+	if err != nil {
 		color.Red("Bashlist encountered an unexpected error. Please try again later.")
 		os.Exit(1)
 	}
@@ -67,25 +66,25 @@ func upload_handler(dirname string) {
 
 	//Header for getting push URL
 	header := req.Header{
-		"Content-Type":"application/json",
-		"Email": username,
-		"Password": hashedPassword,
+		"Content-Type": "application/json",
+		"Email":        username,
+		"Password":     hashedPassword,
 	}
 
 	//JSON Representation of directory name and size
-	vals := PushURLRequester{Name:dirname,Size:strconv.Itoa(int(size))}
-	jsonvals,_ := json.Marshal(vals)
+	vals := PushURLRequester{Name: dirname, Size: strconv.Itoa(int(size))}
+	jsonvals, _ := json.Marshal(vals)
 
 	//Perform Post and receive URL
-	resp, err := req.Post(endpoint, req.BodyJSON(jsonvals),header)
+	resp, err := req.Post(endpoint, req.BodyJSON(jsonvals), header)
 	//Error Performing Post
 	if err != nil {
 		//Do it once More
-		resp, err = req.Post(endpoint, req.BodyJSON(jsonvals),header)
+		resp, err = req.Post(endpoint, req.BodyJSON(jsonvals), header)
 	}
 
 	//Second Time Error
-	if err!=nil{
+	if err != nil {
 		<-conf_comp
 		color.Red("Could not connect to server. Please check your connection and try again later.")
 		return
@@ -95,7 +94,7 @@ func upload_handler(dirname string) {
 	respCode := resp.Response().StatusCode
 
 	//Authentication Error
-	if respCode==403 {
+	if respCode == 403 {
 		//Finish Compression
 		comp_bytes = <-conf_comp
 		//Request Fresh Username & Password From AuthHandler
@@ -105,12 +104,12 @@ func upload_handler(dirname string) {
 		username = *usernamePtr
 		hashedPassword = *passwordPtr
 		header = req.Header{
-			"Content-Type":"application/json",
-			"Email":    username,
-			"Password": hashedPassword,
+			"Content-Type": "application/json",
+			"Email":        username,
+			"Password":     hashedPassword,
 		}
 		resp, err1 := req.Post(endpoint, header, req.BodyJSON(jsonvals))
-		if err1!=nil{
+		if err1 != nil {
 			unexpected_event()
 		}
 		respCode = resp.Response().StatusCode
@@ -119,23 +118,23 @@ func upload_handler(dirname string) {
 			color.Red("Authentication Error!. try again later.")
 			return
 		}
-	//Insufficient Space Error
-	} else if respCode==423 {
+		//Insufficient Space Error
+	} else if respCode == 423 {
 		<-conf_comp
 		color.Red("Insufficient remaining space to add %s to your bashlist.", dirname)
 		return
-	//Insufficient Space - Shared Directory
-	} else if respCode==424{
+		//Insufficient Space - Shared Directory
+	} else if respCode == 424 {
 		<-conf_comp
-		color.Red("%s is a shared directory. The owner has insufficient remaining space for this push",dirname)
+		color.Red("%s is a shared directory. The owner has insufficient remaining space for this push", dirname)
 		return
-	//Other Server Error
-	} else if respCode==399 {
+		//Other Server Error
+	} else if respCode == 399 {
 		<-conf_comp
 		color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
 		return
-	//Received a valid response from server
-	} else{
+		//Received a valid response from server
+	} else {
 
 		//Set Description to Null Value
 		var desc string = "~N////V~"
@@ -145,21 +144,19 @@ func upload_handler(dirname string) {
 
 		//Check if the directory being pushed already exists. Need it to show confirmation messages.
 		exists, err := jsonparser.GetString(byteResp, "Exist")
-		if err!=nil{
+		if err != nil {
 			//If exist variable isn't there. Unexpected response
 			<-conf_comp
 			color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
 			return
 		}
 
-
 		//Get whether directory is shared or not
-		shared,err := jsonparser.GetString(byteResp,"Shared")
+		shared, err := jsonparser.GetString(byteResp, "Shared")
 		//Allocate byte array for file key
 		var file_key *[]byte
 
-
-		if shared=="Y" {
+		if shared == "Y" {
 
 			//Get filekey encrypted with private key
 			key, errkey := jsonparser.GetString(byteResp, "keyval")
@@ -186,12 +183,12 @@ func upload_handler(dirname string) {
 			//Decrypt with private key and get file key
 			file_key, _ = DecryptWithPrivKey(privKeyObj, &byte_key)
 
-		} else if shared=="N"{
+		} else if shared == "N" {
 
 			//Get filedecryption key encrypted by password
 			key, errkey := jsonparser.GetString(byteResp, "Key")
 			//If error, return
-			if errkey!=nil{
+			if errkey != nil {
 				<-conf_comp
 				color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
 				return
@@ -207,15 +204,15 @@ func upload_handler(dirname string) {
 		//make channel for encryption
 		conf_encryption := make(chan *[]byte)
 		//Start encryption
-		go EncryptObject(comp_bytes,file_key,conf_encryption)
+		go EncryptObject(comp_bytes, file_key, conf_encryption)
 
 		//Some lines to seperate from processing stdout
 		fmt.Println()
 		fmt.Println()
 
 		//Description Messages Printer
-		if exists=="Y"{
-			if shared=="N" {
+		if exists == "Y" {
+			if shared == "N" {
 				color.Set(color.FgCyan)
 				fmt.Print("A Directory " + dirname + " already exists in your bashlist. Pushing will update its contents. " +
 					"Do you want to continue?[Y/n] ")
@@ -225,7 +222,7 @@ func upload_handler(dirname string) {
 				if response == "n" || response == "N" || response == "No" || response == "no" {
 					return
 				}
-			}else{
+			} else {
 				color.Set(color.FgCyan)
 				fmt.Print("Directory " + dirname + " already exists and is a shared directory. Pushing will update its contents for all members. " +
 					"Do you want to continue?[Y/n] ")
@@ -245,56 +242,53 @@ func upload_handler(dirname string) {
 			}
 		}
 		fmt.Println("Encrypting contents")
-		encrypted_bytes :=<-conf_encryption
-		if encrypted_bytes==nil{
+		encrypted_bytes := <-conf_encryption
+		if encrypted_bytes == nil {
 			color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
 			return
 		}
 
-		awsFields,_,_,_ := jsonparser.Get(byteResp,"URL","fields")
-		uurl ,_:=jsonparser.GetString(byteResp,"URL","url")
-		conf := upload_helper(&awsFields,encrypted_bytes,uurl)
-		if conf!=1{
+		awsFields, _, _, _ := jsonparser.Get(byteResp, "URL", "fields")
+		uurl, _ := jsonparser.GetString(byteResp, "URL", "url")
+		conf := upload_helper(&awsFields, encrypted_bytes, uurl)
+		if conf != 1 {
 			unexpected_event()
 		}
 
 		//send confirmation
 		header = req.Header{
-			"Content-Type":"application/json",
-			"Email": username,
-			"Password": hashedPassword,
+			"Content-Type": "application/json",
+			"Email":        username,
+			"Password":     hashedPassword,
 		}
 
-		valsConfirmer := PushConfirmer{Name:dirname,Shared:shared,BLDESC:desc}
-		jsonvals,_ = json.Marshal(valsConfirmer)
+		valsConfirmer := PushConfirmer{Name: dirname, Shared: shared, BLDESC: desc}
+		jsonvals, _ = json.Marshal(valsConfirmer)
 		endpoint = URL + PUSH_BUCKET_CONF
 
-
-		resp, err = req.Post(endpoint, req.BodyJSON(jsonvals),header)
+		resp, err = req.Post(endpoint, req.BodyJSON(jsonvals), header)
 		respCode = resp.Response().StatusCode
-		if err!=nil{
-			resp, err = req.Post(endpoint, req.BodyJSON(jsonvals),header)
-			if err!=nil{
+		if err != nil {
+			resp, err = req.Post(endpoint, req.BodyJSON(jsonvals), header)
+			if err != nil {
 				unexpected_event()
 			}
 		}
-		if respCode!=225{
+		if respCode != 225 {
 			fmt.Println(respCode)
-			resp, err = req.Post(endpoint, req.BodyJSON(jsonvals),header)
-			if err!=nil{
-				resp, err = req.Post(endpoint, req.BodyJSON(jsonvals),header)
-				if err!=nil{
+			resp, err = req.Post(endpoint, req.BodyJSON(jsonvals), header)
+			if err != nil {
+				resp, err = req.Post(endpoint, req.BodyJSON(jsonvals), header)
+				if err != nil {
 					unexpected_event()
 				}
 			}
 
 		} else {
-			fmt.Println(dirname+" uploaded successfully.")
+			fmt.Println(dirname + " uploaded successfully.")
 
 		}
 
 	}
 
-
 }
-

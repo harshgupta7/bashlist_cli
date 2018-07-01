@@ -1,88 +1,87 @@
-package main 
+package main
 
 import (
-    "fmt"
-    "os/exec"
-    "bytes"
+	"fmt"
+	"os/exec"
+	"bytes"
 	"os"
 	"github.com/buger/jsonparser"
 	"io/ioutil"
 	"strings"
 )
 
-
-func upload_helper(fields *[]byte, encBytes *[]byte,uurl string)int{
+func upload_helper(fields *[]byte, encBytes *[]byte, uurl string) int {
 
 	codePath := get_code_path()
 
-	filepth := codePath+"/"+".encontents.bls"
+	filepth := codePath + "/" + ".encontents.bls"
 	content := *encBytes
-	err := ioutil.WriteFile(filepth,content,0777)
-	if err!=nil{
+	err := ioutil.WriteFile(filepth, content, 0777)
+	if err != nil {
 		fmt.Println("somewhere else")
 	}
 
 	fieldVals := *fields
 
-	acl,err := jsonparser.GetString(fieldVals,"acl")
-	if err!=nil{
+	acl, err := jsonparser.GetString(fieldVals, "acl")
+	if err != nil {
 		unexpected_event()
 	}
-	key,err := jsonparser.GetString(fieldVals,"key")
-	if err!=nil{
+	key, err := jsonparser.GetString(fieldVals, "key")
+	if err != nil {
 		unexpected_event()
 	}
-	xaa,err := jsonparser.GetString(fieldVals,"x-amz-algorithm")
-	if err!=nil{
+	xaa, err := jsonparser.GetString(fieldVals, "x-amz-algorithm")
+	if err != nil {
 		unexpected_event()
 	}
-	xac,err := jsonparser.GetString(fieldVals,"x-amz-credential")
-	if err!=nil{
+	xac, err := jsonparser.GetString(fieldVals, "x-amz-credential")
+	if err != nil {
 		unexpected_event()
 	}
-	xad,err := jsonparser.GetString(fieldVals,"x-amz-date")
-	if err!=nil{
+	xad, err := jsonparser.GetString(fieldVals, "x-amz-date")
+	if err != nil {
 		unexpected_event()
 	}
-	policy,err := jsonparser.GetString(fieldVals,"policy")
-	if err!=nil{
+	policy, err := jsonparser.GetString(fieldVals, "policy")
+	if err != nil {
 		unexpected_event()
 	}
-	xas,err := jsonparser.GetString(fieldVals,"x-amz-signature")
-	if err!=nil{
+	xas, err := jsonparser.GetString(fieldVals, "x-amz-signature")
+	if err != nil {
 		unexpected_event()
 	}
 
-	aclVal := "acl="+acl+"\n"
-	keyVal := "key="+key+"\n"
-	xaaVal := "x-amz-algorithm="+xaa+"\n"
-	xacVal := "x-amz-credential="+xac+"\n"
-	xadVal := "x-amz-date="+xad+"\n"
-	policyVal := "policy="+policy+"\n"
-	xasVal := "x-amz-signature="+xas+"\n"
+	aclVal := "acl=" + acl + "\n"
+	keyVal := "key=" + key + "\n"
+	xaaVal := "x-amz-algorithm=" + xaa + "\n"
+	xacVal := "x-amz-credential=" + xac + "\n"
+	xadVal := "x-amz-date=" + xad + "\n"
+	policyVal := "policy=" + policy + "\n"
+	xasVal := "x-amz-signature=" + xas + "\n"
 
-	urlVal := "url="+uurl+"\n"
+	urlVal := "url=" + uurl + "\n"
 
-	blconfigfilepath := codePath+"/"+".bashlistuploadconfig.txt"
-	encfilePathVal := "encfile="+filepth+"\n"
+	blconfigfilepath := codePath + "/" + ".bashlistuploadconfig.txt"
+	encfilePathVal := "encfile=" + filepth + "\n"
 
-	file,err := os.Create(blconfigfilepath)
-	if err!=nil{
+	file, err := os.Create(blconfigfilepath)
+	if err != nil {
 		unexpected_event()
 	}
 	defer file.Close()
-	fmt.Fprintf(file,"[default]\n")
-	fmt.Fprintf(file,aclVal)
-	fmt.Fprint(file,keyVal)
-	fmt.Fprint(file,xaaVal)
-	fmt.Fprint(file,xacVal)
-	fmt.Fprint(file,xadVal)
-	fmt.Fprint(file,policyVal)
-	fmt.Fprint(file,xasVal)
-	fmt.Fprint(file,encfilePathVal)
-	fmt.Fprint(file,urlVal)
-	pypath := get_code_path()+"/"+"uploadutil.py"
-	cmd := exec.Command("python", pypath,string(blconfigfilepath))
+	fmt.Fprintf(file, "[default]\n")
+	fmt.Fprintf(file, aclVal)
+	fmt.Fprint(file, keyVal)
+	fmt.Fprint(file, xaaVal)
+	fmt.Fprint(file, xacVal)
+	fmt.Fprint(file, xadVal)
+	fmt.Fprint(file, policyVal)
+	fmt.Fprint(file, xasVal)
+	fmt.Fprint(file, encfilePathVal)
+	fmt.Fprint(file, urlVal)
+	pypath := get_code_path() + "/" + "uploadutil.py"
+	cmd := exec.Command("python", pypath, string(blconfigfilepath))
 	var outb, errb bytes.Buffer
 	cmd.Stdout = &outb
 	cmd.Stderr = &errb
@@ -91,15 +90,14 @@ func upload_helper(fields *[]byte, encBytes *[]byte,uurl string)int{
 		unexpected_event()
 	}
 	statusCode := strings.TrimSpace(outb.String())
-	if statusCode!="204"{
+	if statusCode != "204" {
 		unexpected_event()
 	}
-	err2:=os.Remove(blconfigfilepath)
-	err1:=os.Remove(filepth)
-	if err2 !=nil || err1 !=nil{
+	err2 := os.Remove(blconfigfilepath)
+	err1 := os.Remove(filepth)
+	if err2 != nil || err1 != nil {
 		return 0
 	}
 	return 1
 
 }
-

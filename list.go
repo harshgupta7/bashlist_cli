@@ -12,50 +12,49 @@ import (
 )
 
 type BLObject struct {
-	Name string
-	Size string
-	Updated string
+	Name        string
+	Size        string
+	Updated     string
 	Description string
-	Status string
+	Status      string
 }
 
-
-func print_list(){
+func print_list() {
 	endpoint := URL + BASHLIST_LIST_URL
-	usernamePtr, passwordPtr, _:=authHandler(0)
+	usernamePtr, passwordPtr, _ := authHandler(0)
 
 	username := *usernamePtr
 	hashedPassword := *passwordPtr
 	r := req.New()
 	authHeader := req.Header{
-		"Email":        username,
+		"Email":    username,
 		"Password": hashedPassword,
 	}
 	r.SetTimeout(25 * time.Second)
 	c, err := r.Get(endpoint, authHeader)
-	if err!=nil{
+	if err != nil {
 		c, err = r.Get(endpoint, authHeader)
-		if err!=nil {
+		if err != nil {
 			color.Red("Error contacting Server. Please check you connection and try again")
 			os.Exit(1)
 		}
 	}
 	d := c.Response().StatusCode
-	if d==403 {
+	if d == 403 {
 		authHandler(1)
 		print_list()
 		return
-	} else if d==399{
+	} else if d == 399 {
 		color.Red("Bashlist encountered an unexpected error! Please try again later.")
 		return
-	} else{
+	} else {
 		byteResp, _ := c.ToBytes()
 		empty, err := jsonparser.GetString(byteResp, "Empty")
-		if err!=nil{
+		if err != nil {
 			color.Red("An unexpected error occurred! Aborting operation.")
 			return
 		}
-		if empty=="T"{
+		if empty == "T" {
 			color.Cyan("Your Bashlist Storage is Empty!")
 			color.Cyan("Upload your first directory using bashls push")
 			return

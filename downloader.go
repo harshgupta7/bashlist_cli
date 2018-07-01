@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-func get_download_url(bucketname string, usernamePtr *string, passwordPtr *string)[]byte{
+func get_download_url(bucketname string, usernamePtr *string, passwordPtr *string) []byte {
 
 	/* Gets download url for bucket*/
 
@@ -19,14 +19,14 @@ func get_download_url(bucketname string, usernamePtr *string, passwordPtr *strin
 
 	r := req.New()
 	authHeader := req.Header{
-		"Email":        *usernamePtr,
+		"Email":    *usernamePtr,
 		"Password": *passwordPtr,
 	}
 	r.SetTimeout(25 * time.Second)
 	c, err := r.Get(endpoint, authHeader)
-	if err!=nil{
+	if err != nil {
 		c, err = r.Get(endpoint, authHeader)
-		if err!=nil {
+		if err != nil {
 			color.Red("Error contacting Server. Please check you connection and try again")
 			os.Exit(1)
 		}
@@ -34,122 +34,119 @@ func get_download_url(bucketname string, usernamePtr *string, passwordPtr *strin
 
 	respCode := c.Response().StatusCode
 	//auth error
-	if respCode==403{
-		usernamePtr, passwordPtr,_ = authHandler(1)
+	if respCode == 403 {
+		usernamePtr, passwordPtr, _ = authHandler(1)
 		authHeader = req.Header{
-			"Email":        *usernamePtr,
+			"Email":    *usernamePtr,
 			"Password": *passwordPtr,
 		}
 		c, err = r.Get(endpoint, authHeader)
 		respCode = c.Response().StatusCode
-		if respCode==403{
+		if respCode == 403 {
 			color.Cyan("Bashlist could not authenticate you. Please try again.")
 			os.Exit(1)
 		}
-	//no bucket available
-	} else if respCode==284 {
-		msg := bucketname +": No such directory exists in your bashlist"
+		//no bucket available
+	} else if respCode == 284 {
+		msg := bucketname + ": No such directory exists in your bashlist"
 		color.Red(msg)
 		cyan := color.New(color.FgCyan).SprintFunc()
 		d := color.New(color.FgGreen, color.Bold).SprintFunc()
 		fmt.Printf("%s %s \n", cyan("View your available directories using"), d("bashls"))
 		os.Exit(1)
-	//found bucket
-	} else if respCode==285{
+		//found bucket
+	} else if respCode == 285 {
 		byteResp, err := c.ToBytes()
-		if err!=nil{
+		if err != nil {
 			unexpected_event()
 		}
 		return byteResp
-	//unexpected
-	} else{
+		//unexpected
+	} else {
 		unexpected_event()
 	}
 	return nil
 }
 
-func download_bucket_to_bytes(url string,done chan *[]byte){
+func download_bucket_to_bytes(url string, done chan *[]byte) {
 	/* Downloads bucket from s3 to bytes*/
 
 	r := req.New()
 	r.SetTimeout(100 * time.Second)
-	resp,err := r.Get(url)
-	if err!=nil{
-		resp,err = r.Get(url)
-		if err!=nil{
-			done<-nil
+	resp, err := r.Get(url)
+	if err != nil {
+		resp, err = r.Get(url)
+		if err != nil {
+			done <- nil
 		}
 	}
 
-	if resp.Response().StatusCode!=200{
-		done<-nil
+	if resp.Response().StatusCode != 200 {
+		done <- nil
 		close(done)
 		return
 	}
 	//convert response to bytes
-	res,err := resp.ToBytes()
-	if err!=nil{
-		done<-nil
+	res, err := resp.ToBytes()
+	if err != nil {
+		done <- nil
 	}
 	//ping channel
-	done<-&res
+	done <- &res
 	//close channel
 	close(done)
 }
 
-func decrypt_private_file_key(enc_key *string,pass *string)(*[]byte,error){
+func decrypt_private_file_key(enc_key *string, pass *string) (*[]byte, error) {
 
 	//Decrypts bucket encryption key using password
 
 	password := *pass
-	fileKey,err := decrypt_secret(enc_key,password)
-	if err!=nil{
-		return nil,err
+	fileKey, err := decrypt_secret(enc_key, password)
+	if err != nil {
+		return nil, err
 	}
 	fileKeyval := *fileKey
 	fileKeyBytes := []byte(fileKeyval)
-	return &fileKeyBytes,nil
+	return &fileKeyBytes, nil
 }
 
-
-
-
-func decrypt_shared_file_key(encrypted_private_key *string,enc_file_key *string, pass *string)(*[]byte,error){
+func decrypt_shared_file_key(encrypted_private_key *string, enc_file_key *string, pass *string) (*[]byte, error) {
 
 	//decrypts shared encryption key using private key and password
 
-	privKeyVal,err := decrypt_secret(encrypted_private_key,*pass)
-	if err!=nil{
-		return nil,err
+	privKeyVal, err := decrypt_secret(encrypted_private_key, *pass)
+	if err != nil {
+		return nil, err
 	}
 
-	privKey,err := ParseRsaPrivateKeyFromPemStr(*privKeyVal)
-	if err!=nil{
-		return nil,err
+	privKey, err := ParseRsaPrivateKeyFromPemStr(*privKeyVal)
+	if err != nil {
+		return nil, err
 	}
 	encKeyStr := *enc_file_key
 	encKeyByte := []byte(encKeyStr)
-	keyVal,err := DecryptWithPrivKey(privKey,&encKeyByte)
-	if err!=nil{
-		return nil,err
+	keyVal, err := DecryptWithPrivKey(privKey, &encKeyByte)
+	if err != nil {
+		return nil, err
 	}
-	return keyVal,nil
+	return keyVal, nil
 
 }
 
-func DecryptContents(enc_contents *[]byte, keyval *[]byte)(*[]byte,error){
+func DecryptContents(enc_contents *[]byte, keyval *[]byte) (*[]byte, error) {
 
 	//Decrypt downloaded contents using file key
 
-	contents,err := DecryptObject(enc_contents,keyval)
-	if err!=nil{
-		return nil,err
+	contents, err := DecryptObject(enc_contents, keyval)
+	if err != nil {
+		return nil, err
 	}
-	return contents,nil
+	return contents, nil
 
 }
 
-func unzipContents(zippedContents *[]byte,outpath string){
+func unzipContents(zippedContents *[]byte, outpath string) {
 
 	//Unzip contents
 
@@ -160,20 +157,19 @@ func unzipContents(zippedContents *[]byte,outpath string){
 	contents := *zippedContents
 	c := int64(len(contents))
 	r := bytes.NewReader(contents)
-	zip.Unarchive(r,c,outpath,progress)
+	zip.Unarchive(r, c, outpath, progress)
 }
-
 
 func download_manager(bucketname string) {
 
 	start := time.Now()
 	/* Download Manager*/
-	usernamePtr, passwordPtr,pass := authHandler(0)
+	usernamePtr, passwordPtr, pass := authHandler(0)
 
 	color.Cyan("Initiating Pull:")
-	fmt.Println("  - "+ bucketname)
+	fmt.Println("  - " + bucketname)
 
-	resp := get_download_url(bucketname, usernamePtr,passwordPtr)
+	resp := get_download_url(bucketname, usernamePtr, passwordPtr)
 	//should never happen
 	if resp == nil {
 		unexpected_event()
@@ -217,11 +213,11 @@ func download_manager(bucketname string) {
 		if err != nil {
 			unexpected_event()
 		}
-		fileKey, err = decrypt_private_file_key(&decKey,pass)
+		fileKey, err = decrypt_private_file_key(&decKey, pass)
 		if err != nil {
 			unexpected_event()
 		}
-	//Directory is shared
+		//Directory is shared
 	} else {
 		privKey, err := jsonparser.GetString(resp, "unlock_key")
 		if err != nil {
@@ -231,7 +227,7 @@ func download_manager(bucketname string) {
 		if err != nil {
 			unexpected_event()
 		}
-		fileKey, err = decrypt_shared_file_key(&privKey, &decKey,pass)
+		fileKey, err = decrypt_shared_file_key(&privKey, &decKey, pass)
 		if err != nil {
 			unexpected_event()
 		}
@@ -255,9 +251,7 @@ func download_manager(bucketname string) {
 	unzipContents(contents, outPath)
 	fmt.Printf("Saving Contents:....%s\n", donesig("Done"))
 
-	color.Green("Pull Complete.("+string(time.Since(start))+")")
+	color.Green("Pull Complete.(" + string(time.Since(start)) + ")")
 
 	return
 }
-
-

@@ -13,10 +13,9 @@ func get_account_url()(string){
 
 	/* Fetches unique account url*/
 
-
 	endpoint := URL + GET_ACCOUNT_URL_ENDPOINT
 
-	usernamePtr, passwordPtr, _:=authHandler(0)
+	usernamePtr, passwordPtr, _ := authHandler(0)
 	username := *usernamePtr
 	hashedPassword := *passwordPtr
 
