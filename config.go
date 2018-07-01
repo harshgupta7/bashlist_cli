@@ -9,5 +9,6 @@ var PUSH_BUCKET_CONF string = "api/v01/pbc"
 var PULL_BUCKET_ENDPOINT string = "api/v01/reqpull/"
 var GET_CREDS string = "api/v01/getcreds"
 var POSTCREDS string = "api/v01/postnewcreds"
+var DELETIONDETAIL string = "api/v01/gbi"
 
 

@@ -9,8 +9,6 @@ import (
 	"strconv"
 	"github.com/buger/jsonparser"
 	"bufio"
-
-
 )
 
 type PushURLRequester struct{
@@ -218,16 +216,20 @@ func upload_handler(dirname string) {
 		//Description Messages Printer
 		if exists=="Y"{
 			if shared=="N" {
+				color.Set(color.FgCyan)
 				fmt.Print("A Directory " + dirname + " already exists in your bashlist. Pushing will update its contents. " +
 					"Do you want to continue?[Y/n] ")
+				color.Unset()
 				var response string
 				fmt.Scanln(&response)
 				if response == "n" || response == "N" || response == "No" || response == "no" {
 					return
 				}
 			}else{
+				color.Set(color.FgCyan)
 				fmt.Print("Directory " + dirname + " already exists and is a shared directory. Pushing will update its contents for all members. " +
 					"Do you want to continue?[Y/n] ")
+				color.Unset()
 				var response string
 				fmt.Scanln(&response)
 				if response == "n" || response == "N" || response == "No" || response == "no" {

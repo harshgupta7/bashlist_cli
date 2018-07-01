@@ -90,7 +90,7 @@ func reencrypt(fileKey *string, privKey *string, oldPassword *string, newPasswor
 
 }
 
-func postUpdated(usernamePtr *string, passwordPtr *string,newhashedPassword *string, encPrivKey *string, encFileKey *string)int{
+func postUpdated(usernamePtr *string, oldHashedpasswordPtr *string,newhashedPassword *string, encPrivKey *string, encFileKey *string)int{
 
 	secretVals := SecretPoster{Password:*newhashedPassword,EncFileKey:*encFileKey,EncPrivKey:*encPrivKey}
 	jsonvals,_ := json.Marshal(secretVals)
@@ -98,7 +98,7 @@ func postUpdated(usernamePtr *string, passwordPtr *string,newhashedPassword *str
 	header := req.Header{
 		"Content-Type":"application/json",
 		"Email": *usernamePtr,
-		"Password": *passwordPtr,
+		"Password": *oldHashedpasswordPtr,
 	}
 	resp, err := req.Post(endpoint, req.BodyJSON(jsonvals),header)
 	respCode := resp.Response().StatusCode
@@ -110,11 +110,11 @@ func postUpdated(usernamePtr *string, passwordPtr *string,newhashedPassword *str
 		respCode = resp.Response().StatusCode
 	}
 	if respCode==403{
-		usernamePtr,passwordPtr,_ = authHandler(1)
+		usernamePtr,oldHashedpasswordPtr,_ = authHandler(1)
 		header = req.Header{
 			"Content-Type":"application/json",
 			"Email": *usernamePtr,
-			"Password": *passwordPtr,
+			"Password": *oldHashedpasswordPtr,
 		}
 		resp, err = req.Post(endpoint, req.BodyJSON(jsonvals),header)
 		respCode = resp.Response().StatusCode
@@ -131,6 +131,7 @@ func postUpdated(usernamePtr *string, passwordPtr *string,newhashedPassword *str
 }
 
 func changePassManager(){
-	return
+
+
 }
 

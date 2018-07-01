@@ -1,5 +1,11 @@
 package main
 
+import (
+	"github.com/fatih/color"
+	"fmt"
+	"os"
+)
+
 func main(){
 	/*Main function*/
 	// c,_:=get_size("django")
@@ -39,7 +45,14 @@ func main(){
 	//}
 	//fmt.Print(strings.TrimSpace(outb.String()))
 	//upload_handler("bashlist_production")
-	download_manager("bashlist_production")
+	//download_manager("bashlist_production")
+	dir_name := "swcli"
+	msg := dir_name +": No such bucket exists in your bashlist"
+	color.Red(msg)
+	cyan := color.New(color.FgCyan).SprintFunc()
+	d := color.New(color.FgGreen, color.Bold).SprintFunc()
+	fmt.Printf("%s %s \n", cyan("View your available directories using"), d("bashls"))
+	os.Exit(1)
 	//statusCode := strings.TrimSpace(outb.String())
 	//if statusCode!="204"{
 	//	unexpected_event()

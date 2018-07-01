@@ -48,9 +48,11 @@ func get_download_url(bucketname string, usernamePtr *string, passwordPtr *strin
 		}
 	//no bucket available
 	} else if respCode==284 {
+		msg := bucketname +": No such directory exists in your bashlist"
+		color.Red(msg)
 		cyan := color.New(color.FgCyan).SprintFunc()
 		d := color.New(color.FgGreen, color.Bold).SprintFunc()
-		fmt.Printf("%s %s.\n", cyan(": Does not exist. View your available directories using"), d("bashls"))
+		fmt.Printf("%s %s \n", cyan("View your available directories using"), d("bashls"))
 		os.Exit(1)
 	//found bucket
 	} else if respCode==285{
@@ -164,8 +166,12 @@ func unzipContents(zippedContents *[]byte,outpath string){
 
 func download_manager(bucketname string) {
 
+	start := time.Now()
 	/* Download Manager*/
 	usernamePtr, passwordPtr,pass := authHandler(0)
+
+	color.Cyan("Initiating Pull:")
+	fmt.Println("  - "+ bucketname)
 
 	resp := get_download_url(bucketname, usernamePtr,passwordPtr)
 	//should never happen
@@ -242,8 +248,15 @@ func download_manager(bucketname string) {
 		unexpected_event()
 	}
 
+	donesig := color.New(color.FgGreen).SprintFunc()
+	fmt.Printf("Decrypting Contents:....%s\n", donesig("Done"))
+
 	//Unzip and save data
 	unzipContents(contents, outPath)
+	fmt.Printf("Saving Contents:....%s\n", donesig("Done"))
+
+	color.Green("Pull Complete.("+string(time.Since(start))+")")
+
 	return
 }
 

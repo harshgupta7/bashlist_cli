@@ -93,8 +93,9 @@ func incorrect_auth_loop() (*string,*string,*string){
 				continue
 			}
 			if response=="T"{
-
-				color.Cyan("Do you wish to save your credentials on this machine? [Y/n] ")
+				color.Set(color.FgCyan)
+				fmt.Print("Do you wish to save your credentials on this machine? [Y/n] ")
+				color.Unset()
 				var response string
 				fmt.Scanln(&response)
 				if response == "n" || response == "N" || response == "No" || response == "no" {
