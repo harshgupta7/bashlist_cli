@@ -8,7 +8,6 @@ import (
 	"os"
 	"encoding/json"
 	"github.com/olekukonko/tablewriter"
-	"fmt"
 )
 
 type BLObject struct {
@@ -67,14 +66,21 @@ func print_list() {
 				return
 
 			}
-			var keys []BLObject
+			keys := make([]BLObject,0)
 			json.Unmarshal(response, &keys)
 			table := tablewriter.NewWriter(os.Stdout)
-			table.SetHeader([]string{"Name", "Description", "Size", "Updated", "Status"})
-			fmt.Println(keys)
+			table.SetRowLine(false)
+			table.SetBorder(false)
+			table.SetColumnSeparator(" ")
+			//table.SetHeader([]string{"Name", "Description", "Size", "Updated", "Status"})
+			//fmt.Println(keys)
+			var s []string
+			s = append(s, "Name", "Description", "Size", "Status")
+			table.Append(s)
+
 			for _, obj := range keys {
 				var s []string
-				s = append(s, obj.Name, obj.Description, obj.Size, obj.Updated, obj.Status)
+				s = append(s, obj.Name, obj.Description, string(obj.Size), obj.Status)
 				table.Append(s)
 			}
 			table.Render()
