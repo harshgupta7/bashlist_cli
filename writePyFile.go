@@ -3,10 +3,11 @@ import "os"
 import (
 	"fmt"
 	"github.com/buger/jsonparser"
+	"time"
 )
 
 func writerPy(filname string, fields *[]byte,encfilePath string, uurl string)int{
-
+	start := time.Now()
 	fieldVals := *fields
 
 	acl, err := jsonparser.GetString(fieldVals, "acl")
@@ -38,13 +39,13 @@ func writerPy(filname string, fields *[]byte,encfilePath string, uurl string)int
 		unexpected_event()
 	}
 
-	aclVal := acl + "\n"
-	keyVal := key + "\n"
-	xaaVal := xaa + "\n"
-	xacVal := xac + "\n"
-	xadVal := xad + "\n"
-	policyVal := policy + "\n"
-	xasVal := xas + "\n"
+	aclVal := acl
+	keyVal := key
+	xaaVal := xaa
+	xacVal := xac
+	xadVal := xad
+	policyVal := policy
+	xasVal := xas
 
 	urlVal := uurl
 
@@ -66,17 +67,18 @@ func writerPy(filname string, fields *[]byte,encfilePath string, uurl string)int
 	fmt.Fprintf(file, "from collections import OrderedDict\n")
 	fmt.Fprintf(file, "config = ConfigParser.ConfigParser()\n")
 	fmt.Fprintf(file, "inputDict = OrderedDict()\n")
-	fmt.Fprintf(file, "inputDict['acl'] = %s",aclVal)
-	fmt.Fprintf(file, "inputDict['key'] = %s",keyVal)
-	fmt.Fprintf(file, "inputDict['x-amz-algorithm']= %s",xaaVal)
-	fmt.Fprintf(file, "inputDict['x-amz-credential']=%s",xacVal)
-	fmt.Fprintf(file, "inputDict['x-amz-date']=%s",xadVal)
-	fmt.Fprintf(file, "inputDict['policy']=%s",policyVal)
-	fmt.Fprintf(file, "inputDict['x-amz-signature']=%s",xasVal)
-	fmt.Fprintf(file, "files = {'file':open(%s,'rb')}\n",encfilePath)
-	fmt.Fprintf(file, "resp = requests.post(url=%s,data=inputDict,files=files\n)",urlVal)
+	fmt.Fprintf(file, "inputDict['acl'] = '%s'\n",aclVal)
+	fmt.Fprintf(file, "inputDict['key'] = '%s'\n",keyVal)
+	fmt.Fprintf(file, "inputDict['x-amz-algorithm']= '%s'\n",xaaVal)
+	fmt.Fprintf(file, "inputDict['x-amz-credential']='%s'\n",xacVal)
+	fmt.Fprintf(file, "inputDict['x-amz-date']='%s'\n",xadVal)
+	fmt.Fprintf(file, "inputDict['policy']='%s'\n",policyVal)
+	fmt.Fprintf(file, "inputDict['x-amz-signature']='%s'\n",xasVal)
+	fmt.Fprintf(file, "files = {'file':open('%s','rb')}\n",encfilePath)
+	fmt.Fprintf(file, "resp = requests.post(url='%s',data=inputDict,files=files)\n",urlVal)
 	fmt.Fprintf(file, "print(resp.status_code)\n")
-
+	elapsed := time.Since(start)
+	fmt.Println(elapsed)
 	return 1
 
 }

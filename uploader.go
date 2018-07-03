@@ -251,7 +251,7 @@ func upload_handler(dirname string) {
 		awsFields, _, _, _ := jsonparser.Get(byteResp, "URL", "fields")
 		uurl, _ := jsonparser.GetString(byteResp, "URL", "url")
 		conf := upload_helper(&awsFields, encrypted_bytes, uurl)
-		if conf != 1 {
+		if conf == 1 {
 			unexpected_event()
 		}
 

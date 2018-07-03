@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
+	upload_handler("swcli")
 	// c := get_code_path()
 	// fmt.Println(c)
 	// filename, _ := osext.Executable()
