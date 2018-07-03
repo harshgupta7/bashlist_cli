@@ -1,55 +1,44 @@
 package main
-import "os"
+
 import (
+	"os"
 	"fmt"
 	"github.com/buger/jsonparser"
 	"time"
 )
 
-func writerPy(filname string, fields *[]byte,encfilePath string, uurl string)int{
+func writerPy(filname string, fields *[]byte, encfilePath string, uurl string) int {
 	start := time.Now()
 	fieldVals := *fields
 
-	acl, err := jsonparser.GetString(fieldVals, "acl")
+	aclVal, err := jsonparser.GetString(fieldVals, "acl")
 	if err != nil {
 		unexpected_event()
 	}
-	key, err := jsonparser.GetString(fieldVals, "key")
+	keyVal, err := jsonparser.GetString(fieldVals, "key")
 	if err != nil {
 		unexpected_event()
 	}
-	xaa, err := jsonparser.GetString(fieldVals, "x-amz-algorithm")
+	xaaVal, err := jsonparser.GetString(fieldVals, "x-amz-algorithm")
 	if err != nil {
 		unexpected_event()
 	}
-	xac, err := jsonparser.GetString(fieldVals, "x-amz-credential")
+	xacVal, err := jsonparser.GetString(fieldVals, "x-amz-credential")
 	if err != nil {
 		unexpected_event()
 	}
-	xad, err := jsonparser.GetString(fieldVals, "x-amz-date")
+	xadVal, err := jsonparser.GetString(fieldVals, "x-amz-date")
 	if err != nil {
 		unexpected_event()
 	}
-	policy, err := jsonparser.GetString(fieldVals, "policy")
+	policyVal, err := jsonparser.GetString(fieldVals, "policy")
 	if err != nil {
 		unexpected_event()
 	}
-	xas, err := jsonparser.GetString(fieldVals, "x-amz-signature")
+	xasVal, err := jsonparser.GetString(fieldVals, "x-amz-signature")
 	if err != nil {
 		unexpected_event()
 	}
-
-	aclVal := acl
-	keyVal := key
-	xaaVal := xaa
-	xacVal := xac
-	xadVal := xad
-	policyVal := policy
-	xasVal := xas
-
-	urlVal := uurl
-
-
 	file, err := os.Create(filname)
 	if err != nil {
 		fmt.Println("hh")
@@ -67,15 +56,15 @@ func writerPy(filname string, fields *[]byte,encfilePath string, uurl string)int
 	fmt.Fprintf(file, "from collections import OrderedDict\n")
 	fmt.Fprintf(file, "config = ConfigParser.ConfigParser()\n")
 	fmt.Fprintf(file, "inputDict = OrderedDict()\n")
-	fmt.Fprintf(file, "inputDict['acl'] = '%s'\n",aclVal)
-	fmt.Fprintf(file, "inputDict['key'] = '%s'\n",keyVal)
-	fmt.Fprintf(file, "inputDict['x-amz-algorithm']= '%s'\n",xaaVal)
-	fmt.Fprintf(file, "inputDict['x-amz-credential']='%s'\n",xacVal)
-	fmt.Fprintf(file, "inputDict['x-amz-date']='%s'\n",xadVal)
-	fmt.Fprintf(file, "inputDict['policy']='%s'\n",policyVal)
-	fmt.Fprintf(file, "inputDict['x-amz-signature']='%s'\n",xasVal)
-	fmt.Fprintf(file, "files = {'file':open('%s','rb')}\n",encfilePath)
-	fmt.Fprintf(file, "resp = requests.post(url='%s',data=inputDict,files=files)\n",urlVal)
+	fmt.Fprintf(file, "inputDict['acl'] = '%s'\n", aclVal)
+	fmt.Fprintf(file, "inputDict['key'] = '%s'\n", keyVal)
+	fmt.Fprintf(file, "inputDict['x-amz-algorithm']= '%s'\n", xaaVal)
+	fmt.Fprintf(file, "inputDict['x-amz-credential']='%s'\n", xacVal)
+	fmt.Fprintf(file, "inputDict['x-amz-date']='%s'\n", xadVal)
+	fmt.Fprintf(file, "inputDict['policy']='%s'\n", policyVal)
+	fmt.Fprintf(file, "inputDict['x-amz-signature']='%s'\n", xasVal)
+	fmt.Fprintf(file, "files = {'file':open('%s','rb')}\n", encfilePath)
+	fmt.Fprintf(file, "resp = requests.post(url='%s',data=inputDict,files=files)\n", uurl)
 	fmt.Fprintf(file, "print(resp.status_code)\n")
 	elapsed := time.Since(start)
 	fmt.Println(elapsed)

@@ -8,6 +8,7 @@ import (
 	"os"
 	"encoding/json"
 	"github.com/olekukonko/tablewriter"
+	"fmt"
 )
 
 type BLObject struct {
@@ -54,8 +55,14 @@ func print_list() {
 			return
 		}
 		if empty == "T" {
+			cyan := color.New(color.FgCyan).SprintFunc()
+			d := color.New(color.FgGreen, color.Bold).SprintFunc()
 			color.Cyan("Your Bashlist Storage is Empty!")
-			color.Cyan("Upload your first directory using bashls push")
+			fmt.Printf("%s %s \n", cyan("Upload your first directory using "), d("bls push"))
+			fmt.Println()
+			fmt.Printf("%s %s \n", cyan("View help page using "), d("bls help"))
+			os.Exit(1)
+			upload_handler("swcli")
 			return
 		} else {
 
@@ -72,8 +79,6 @@ func print_list() {
 			table.SetRowLine(false)
 			table.SetBorder(false)
 			table.SetColumnSeparator(" ")
-			//table.SetHeader([]string{"Name", "Description", "Size", "Updated", "Status"})
-			//fmt.Println(keys)
 			var s []string
 			s = append(s, "Name", "Description", "Size", "Status")
 			table.Append(s)
