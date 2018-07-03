@@ -7,8 +7,12 @@ else:
 	import configparser as ConfigParser
 from collections import OrderedDict
 config = ConfigParser.ConfigParser()
+
 path = sys.argv[1]
 config.readfp(open('.bashlistuploadconfig.txt'.encode()))
+
+
+
 inputDict = OrderedDict()
 inputDict['acl'] = config.get('default','acl')
 inputDict['key'] = config.get('default','key')

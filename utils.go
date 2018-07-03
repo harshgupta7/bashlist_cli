@@ -13,7 +13,7 @@ import (
 )
 
 func get_code_path()(string){
-	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	dir, err := filepath.Abs(filepath.Dir(os.Args[1]))
     if err != nil {
             log.Fatal(err)
     }
@@ -120,16 +120,6 @@ func get_size(path string) (int64, error) {
     })
     return size, err
 }
-
-//func get_object_count(directory string)int{
-//	/* Counts number of objects in directory*/
-//	files,err := ioutil.ReadDir(directory)
-//	if err!=nil{
-//		fmt.Println("An Unexpected Error Occurred. Please try again later")
-//		os.Exit(1)
-//	}
-//	return len(files)
-//}
 
 func get_cwd()*string{
 	/* Gets the current working directory*/
