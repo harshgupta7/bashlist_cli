@@ -73,7 +73,7 @@ func print_list() {
 				return
 
 			}
-			keys := make([]BLObject,0)
+			keys := make([]BLObject, 0)
 			json.Unmarshal(response, &keys)
 			table := tablewriter.NewWriter(os.Stdout)
 			table.SetRowLine(false)
