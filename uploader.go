@@ -38,8 +38,8 @@ func upload_handler(dirname string) {
 	ex := directory_exists(dirname, "push")
 	//No Directory Exists Return
 	if ex == false {
-		fmt.Print("adad")
-		return
+		color.Red(dirname + ": No such directory exists.")
+		os.Exit(1)
 	}
 
 	//Initiate operation
@@ -137,7 +137,7 @@ func upload_handler(dirname string) {
 	} else {
 
 		//Set Description to Null Value
-		var desc string = "~N////V~"
+		var desc = "~N////V~"
 
 		//Get Byte Resp
 		byteResp, _ := resp.ToBytes()
@@ -251,7 +251,7 @@ func upload_handler(dirname string) {
 		awsFields, _, _, _ := jsonparser.Get(byteResp, "URL", "fields")
 		uurl, _ := jsonparser.GetString(byteResp, "URL", "url")
 		conf := upload_helper(&awsFields, encrypted_bytes, uurl)
-		if conf == 1 {
+		if conf != 1 {
 			unexpected_event()
 		}
 
