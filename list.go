@@ -80,12 +80,12 @@ func print_list() {
 			table.SetBorder(false)
 			table.SetColumnSeparator(" ")
 			var s []string
-			s = append(s, "Name", "Description", "Size", "Status")
+			s = append(s, "Name", "Updated","Description", "Size", "Status")
 			table.Append(s)
 
 			for _, obj := range keys {
 				var s []string
-				s = append(s, obj.Name, obj.Description, string(obj.Size), obj.Status)
+				s = append(s, obj.Name, obj.Updated,obj.Description, string(obj.Size), obj.Status)
 				table.Append(s)
 			}
 			table.Render()

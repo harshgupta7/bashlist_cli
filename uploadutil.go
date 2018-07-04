@@ -26,7 +26,7 @@ func upload_helper(fields *[]byte, encBytes *[]byte, uurl string) int {
 	}
 	pypath := codePath + "/" + ".uploader.py"
 	k := writerPy(pypath, fields, encfilepth, uurl)
-	if k!=1{
+	if k != 1 {
 		unexpected_event()
 	}
 	cmd := exec.Command("python", pypath)

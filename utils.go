@@ -12,37 +12,37 @@ import (
 	"crypto/rand"
 )
 
-func get_code_path()(string){
+func get_code_path() (string) {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[1]))
-    if err != nil {
-            log.Fatal(err)
-    }
-    return dir
+	if err != nil {
+		log.Fatal(err)
+	}
+	return dir
 }
 
-func unexpected_event(){
+func unexpected_event() {
 	color.Red("Bashlist encountered an unexpected error. Please try again later.")
 	os.Exit(1)
 }
 
-func generate_random_string(length int)(string,error){
+func generate_random_string(length int) (string, error) {
 
 	var chars = []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
 	if length == 0 {
-		return "",nil
+		return "", nil
 	}
 	clen := len(chars)
 	if clen < 2 || clen > 256 {
-		return "",errors.New("Insufficient length size ")
-		
+		return "", errors.New("Insufficient length size ")
+
 	}
 	maxrb := 255 - (256 % clen)
 	b := make([]byte, length)
-	r := make([]byte, length+(length/4)) 
+	r := make([]byte, length+(length/4))
 	i := 0
 	for {
 		if _, err := rand.Read(r); err != nil {
-			return "",err
+			return "", err
 		}
 		for _, rb := range r {
 			c := int(rb)
@@ -52,7 +52,7 @@ func generate_random_string(length int)(string,error){
 			b[i] = chars[c%clen]
 			i++
 			if i == length {
-				return string(b),nil
+				return string(b), nil
 			}
 		}
 	}
@@ -60,79 +60,80 @@ func generate_random_string(length int)(string,error){
 
 func object_exists(path string) (bool, error) {
 	/* Checks whether a path is a valid path*/
-    _, err := os.Stat(path)
-    if err == nil { return true, nil }
-    if os.IsNotExist(err) { return false, nil }
-    return true, err
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return true, err
 }
 
 func IsDirectory(path string) (bool, error) {
 
 	/* Checks whether a object is directory or a file*/
-    fileInfo, err := os.Stat(path)
-    return fileInfo.IsDir(), err
+	fileInfo, err := os.Stat(path)
+	return fileInfo.IsDir(), err
 }
 
-
-func directory_exists(dirname string, context string)(bool){
+func directory_exists(dirname string, context string) (bool) {
 	/*Checks whether a directory exists in the cwd or not*/
 	cwd_address := get_cwd()
 	cwd := *cwd_address
-	path := cwd+"/"+dirname
-	exists,err:=object_exists(path)
-	if err!=nil{
+	path := cwd + "/" + dirname
+	exists, err := object_exists(path)
+	if err != nil {
 		unexpected_event()
 	}
-	if !exists && context=="pull"{
+	if !exists && context == "pull" {
 		return false
 	}
-	if !exists && context=="push"{
-		color.Cyan(dirname+": No such file or directory")
+	if !exists && context == "push" {
+		color.Cyan(dirname + ": No such file or directory")
 		return false
 	}
-	isDir,dirErr := IsDirectory(path)
-	if dirErr!=nil{
+	isDir, dirErr := IsDirectory(path)
+	if dirErr != nil {
 		unexpected_event()
 	}
-	if isDir{
+	if isDir {
 		return true
-	}else if !isDir && context=="pull"{
+	} else if !isDir && context == "pull" {
 		return false
 	}
-	if !isDir && context=="push"{
-		fmt.Println(dirname+": Not a directory. Only directories can be pushed to bashlist.")
-		fmt.Println("Place "+dirname+" inside a directory to push.")
+	if !isDir && context == "push" {
+		fmt.Println(dirname + ": Not a directory. Only directories can be pushed to bashlist.")
+		fmt.Println("Place " + dirname + " inside a directory to push.")
 		return false
 	}
 	return false
 }
 
-
 func get_size(path string) (int64, error) {
 	/*Gets the size of object*/
 	//WARNING: MUST CHECK FOR EXISTENCE BEFORE USING. FAILURE WILL RESULT IN SEG FAULT.
-    var size int64
-    err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
-        if !info.IsDir() {
-            size += info.Size()
-        }
-        return err
-    })
-    return size, err
+	var size int64
+	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			size += info.Size()
+		}
+		return err
+	})
+	return size, err
 }
 
-func get_cwd()*string{
+func get_cwd() *string {
 	/* Gets the current working directory*/
-    dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-    if err!=nil{
-    	fmt.Println("An Unexpected Error Occurred. Please try again later")
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		fmt.Println("An Unexpected Error Occurred. Please try again later")
 		os.Exit(1)
-    }
-    return &dir
+	}
+	return &dir
 }
 
-
-func dir_to_compressed_bytes(dirname string,done chan *[]byte)() {
+func dir_to_compressed_bytes(dirname string, done chan *[]byte) () {
 	/* Compresses a directory and converts it to byte array*/
 	donesig := color.New(color.FgGreen).SprintFunc()
 	buf := new(bytes.Buffer)
@@ -144,14 +145,9 @@ func dir_to_compressed_bytes(dirname string,done chan *[]byte)() {
 		color.Red("Bashlist encountered an unexpected error while processing %s", dirname)
 	}
 
-	var arr= buf.Bytes()
+	var arr = buf.Bytes()
 	done <- &arr
 
 	close(done)
 
 }
-
-
-
-
-
