@@ -7,8 +7,7 @@ import (
 	//"os"
 	//"github.com/buger/jsonparser"
 	"io/ioutil"
-	//"strings"
-	"os"
+
 	"os/exec"
 	"bytes"
 	"strings"
@@ -27,6 +26,7 @@ func upload_helper(fields *[]byte, encBytes *[]byte, uurl string) int {
 	pypath := codePath + "/" + ".uploader.py"
 	k := writerPy(pypath, fields, encfilepth, uurl)
 	if k != 1 {
+		fmt.Println(k)
 		unexpected_event()
 	}
 	cmd := exec.Command("python", pypath)
@@ -35,16 +35,19 @@ func upload_helper(fields *[]byte, encBytes *[]byte, uurl string) int {
 	cmd.Stderr = &errb
 	err = cmd.Run()
 	if err != nil {
+		fmt.Println("haha")
+		fmt.Println(err)
 		unexpected_event()
 	}
 	statusCode := strings.TrimSpace(outb.String())
 	if statusCode != "204" {
+		fmt.Println(statusCode)
 		unexpected_event()
 	}
-	err2 := os.Remove(pypath)
-	err1 := os.Remove(encfilepth)
-	if err2 != nil || err1 != nil {
-		return 0
-	}
+	//err2 := os.Remove(pypath)
+	//err1 := os.Remove(encfilepth)
+	//if err2 != nil || err1 != nil {
+	//	return 0
+	//}
 	return 1
 }

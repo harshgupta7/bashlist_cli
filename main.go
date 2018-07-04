@@ -38,7 +38,7 @@ func main() {
 			return
 		}
 	} else if numArgs==1{
-		if os.Args[0]=="bashls" {
+		if os.Args[0]=="bls" {
 			print_list()
 			return
 		}else{

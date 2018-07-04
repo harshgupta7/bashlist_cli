@@ -251,7 +251,9 @@ func download_manager(bucketname string) {
 	unzipContents(contents, outPath)
 	fmt.Printf("Saving Contents:....%s\n", donesig("Done"))
 
-	color.Green("Pull Complete.(" + string(time.Since(start)) + ")")
+	elapsed := time.Since(start)
+	fmt.Print("Pull Complete ")
+	fmt.Println(elapsed)
 
 	return
 }

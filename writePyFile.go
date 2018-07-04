@@ -4,11 +4,10 @@ import (
 	"os"
 	"fmt"
 	"github.com/buger/jsonparser"
-	"time"
 )
 
 func writerPy(filname string, fields *[]byte, encfilePath string, uurl string) int {
-	start := time.Now()
+
 	fieldVals := *fields
 
 	aclVal, err := jsonparser.GetString(fieldVals, "acl")
@@ -49,7 +48,7 @@ func writerPy(filname string, fields *[]byte, encfilePath string, uurl string) i
 	fmt.Fprintf(file, "import sys\n")
 	fmt.Fprintf(file, "import os\n")
 	fmt.Fprintf(file, "import requests\n")
-	fmt.Fprintf(file, "if sys.version_info[0]<3\n")
+	fmt.Fprintf(file, "if sys.version_info[0]<3:\n")
 	fmt.Fprintf(file, "    import ConfigParser\n")
 	fmt.Fprintf(file, "else:\n")
 	fmt.Fprintf(file, "    import configparser as ConfigParser\n")
@@ -66,8 +65,6 @@ func writerPy(filname string, fields *[]byte, encfilePath string, uurl string) i
 	fmt.Fprintf(file, "files = {'file':open('%s','rb')}\n", encfilePath)
 	fmt.Fprintf(file, "resp = requests.post(url='%s',data=inputDict,files=files)\n", uurl)
 	fmt.Fprintf(file, "print(resp.status_code)\n")
-	elapsed := time.Since(start)
-	fmt.Println(elapsed)
 	return 1
 
 }

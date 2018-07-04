@@ -241,7 +241,9 @@ func upload_handler(dirname string) {
 				break
 			}
 		}
-		fmt.Println("Encrypting contents")
+		donesig := color.New(color.FgGreen).SprintFunc()
+		fmt.Print("Encrypting contents.....")
+		fmt.Printf("%s\n",donesig("OK"))
 		encrypted_bytes := <-conf_encryption
 		if encrypted_bytes == nil {
 			color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
@@ -250,10 +252,12 @@ func upload_handler(dirname string) {
 
 		awsFields, _, _, _ := jsonparser.Get(byteResp, "URL", "fields")
 		uurl, _ := jsonparser.GetString(byteResp, "URL", "url")
+		fmt.Print("Uploading contents.....")
 		conf := upload_helper(&awsFields, encrypted_bytes, uurl)
 		if conf != 1 {
 			unexpected_event()
 		}
+		fmt.Printf("%s\n",donesig("OK"))
 
 		//send confirmation
 		header = req.Header{
@@ -285,7 +289,7 @@ func upload_handler(dirname string) {
 			}
 
 		} else {
-			fmt.Println(dirname + " uploaded successfully.")
+			color.Green(dirname + " uploaded successfully.")
 
 		}
 

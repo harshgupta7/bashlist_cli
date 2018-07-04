@@ -85,7 +85,13 @@ func print_list() {
 
 			for _, obj := range keys {
 				var s []string
-				s = append(s, obj.Name, obj.Updated,obj.Description, string(obj.Size), obj.Status)
+				var c string
+				if obj.Description=="~N////V~" {
+					c = "None"
+				} else{
+					c = obj.Description
+				}
+				s = append(s, obj.Name, obj.Updated,c, string(obj.Size), obj.Status)
 				table.Append(s)
 			}
 			table.Render()

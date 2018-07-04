@@ -1,0 +1,14 @@
+{
+  "name": "bashlist",
+  "version": "1.0.0",
+  "description": "",
+  "bin": {
+    "bls": "./account"
+  },
+  "scripts":{
+    "preinstall":"pip install requests"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
+}
