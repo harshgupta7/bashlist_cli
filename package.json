@@ -1,12 +1,12 @@
 {
-  "name": "bashlist",
+  "name": "Bashlist",
   "version": "1.0.0",
   "description": "",
   "bin": {
-    "bls": "./account"
+    "bls": "./bashlsbin"
   },
-  "scripts":{
-    "preinstall":"pip install requests"
+  "scripts": {
+    "preinstall": "pip install requests && python osdetect.py"
   },
   "author": "",
   "license": "ISC",

