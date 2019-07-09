@@ -8,8 +8,8 @@ import (
 	//"github.com/buger/jsonparser"
 	"io/ioutil"
 
-	"os/exec"
 	"bytes"
+	"os/exec"
 	"strings"
 )
 

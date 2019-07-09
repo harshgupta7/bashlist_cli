@@ -7,8 +7,8 @@ import (
 	"github.com/fatih/color"
 	"github.com/imroc/req"
 	"github.com/pierrre/archivefile/zip"
-	"time"
 	"os"
+	"time"
 )
 
 func get_download_url(bucketname string, usernamePtr *string, passwordPtr *string) []byte {

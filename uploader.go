@@ -1,14 +1,14 @@
 package main
 
 import (
-	"github.com/imroc/req"
-	"fmt"
+	"bufio"
 	"encoding/json"
+	"fmt"
+	"github.com/buger/jsonparser"
 	"github.com/fatih/color"
+	"github.com/imroc/req"
 	"os"
 	"strconv"
-	"github.com/buger/jsonparser"
-	"bufio"
 )
 
 type PushURLRequester struct {
@@ -243,7 +243,7 @@ func upload_handler(dirname string) {
 		}
 		donesig := color.New(color.FgGreen).SprintFunc()
 		fmt.Print("Encrypting contents.....")
-		fmt.Printf("%s\n",donesig("OK"))
+		fmt.Printf("%s\n", donesig("OK"))
 		encrypted_bytes := <-conf_encryption
 		if encrypted_bytes == nil {
 			color.Red("An unexpected error occurred while pushing %s. Please try again later", dirname)
@@ -257,7 +257,7 @@ func upload_handler(dirname string) {
 		if conf != 1 {
 			unexpected_event()
 		}
-		fmt.Printf("%s\n",donesig("OK"))
+		fmt.Printf("%s\n", donesig("OK"))
 
 		//send confirmation
 		header = req.Header{

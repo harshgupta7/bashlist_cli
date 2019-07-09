@@ -1,9 +1,9 @@
 package main
 
 import (
-	"os"
 	"fmt"
 	"github.com/buger/jsonparser"
+	"os"
 )
 
 func writerPy(filname string, fields *[]byte, encfilePath string, uurl string) int {

@@ -1,10 +1,10 @@
 package main
 
 import (
+	"encoding/json"
+	"github.com/buger/jsonparser"
 	"github.com/imroc/req"
 	"time"
-	"github.com/buger/jsonparser"
-	"encoding/json"
 )
 
 type SecretPoster struct {
@@ -130,7 +130,5 @@ func postUpdated(usernamePtr *string, oldHashedpasswordPtr *string, newhashedPas
 }
 
 func changePassManager() {
-
-
 
 }

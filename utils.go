@@ -1,18 +1,18 @@
 package main
 
 import (
-	"path/filepath"
-	"os"
-	"log"
-	"github.com/fatih/color"
-	"fmt"
-	"github.com/pierrre/archivefile/zip"
 	"bytes"
-	"errors"
 	"crypto/rand"
+	"errors"
+	"fmt"
+	"github.com/fatih/color"
+	"github.com/pierrre/archivefile/zip"
+	"log"
+	"os"
+	"path/filepath"
 )
 
-func get_code_path() (string) {
+func get_code_path() string {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[1]))
 	if err != nil {
 		log.Fatal(err)
@@ -77,7 +77,7 @@ func IsDirectory(path string) (bool, error) {
 	return fileInfo.IsDir(), err
 }
 
-func directory_exists(dirname string, context string) (bool) {
+func directory_exists(dirname string, context string) bool {
 	/*Checks whether a directory exists in the cwd or not*/
 	cwd_address := get_cwd()
 	cwd := *cwd_address
@@ -133,7 +133,7 @@ func get_cwd() *string {
 	return &dir
 }
 
-func dir_to_compressed_bytes(dirname string, done chan *[]byte) () {
+func dir_to_compressed_bytes(dirname string, done chan *[]byte) {
 	/* Compresses a directory and converts it to byte array*/
 	donesig := color.New(color.FgGreen).SprintFunc()
 	buf := new(bytes.Buffer)

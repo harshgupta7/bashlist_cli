@@ -66,7 +66,7 @@ func DecryptWithPrivKey(priv_key *rsa.PrivateKey, ciphertext *[]byte) (*[]byte, 
 	return &plainText, nil
 }
 
-func EncryptObject(plaintextptr *[]byte, keyptr *[]byte, encrypted chan *[]byte) () {
+func EncryptObject(plaintextptr *[]byte, keyptr *[]byte, encrypted chan *[]byte) {
 	/* Encrypts a byte array with a key*/
 
 	var plaintext = *plaintextptr

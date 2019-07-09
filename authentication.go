@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/zalando/go-keyring"
+	"github.com/buger/jsonparser"
 	"github.com/fatih/color"
 	"github.com/howeyc/gopass"
 	"github.com/imroc/req"
-	"github.com/buger/jsonparser"
+	"github.com/zalando/go-keyring"
 	"time"
 )
 

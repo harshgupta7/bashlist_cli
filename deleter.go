@@ -1,15 +1,15 @@
 package main
 
 import (
-	"github.com/imroc/req"
-	"time"
-	"github.com/fatih/color"
-	"os"
 	"fmt"
 	"github.com/buger/jsonparser"
+	"github.com/fatih/color"
+	"github.com/imroc/req"
+	"os"
+	"time"
 )
 
-func requestDeletetionDetails(dir_name string, usernamePtr *string, hashedPasswordPtr *string) (*[]byte) {
+func requestDeletetionDetails(dir_name string, usernamePtr *string, hashedPasswordPtr *string) *[]byte {
 
 	endpoint := URL + DELETIONDETAIL + "/" + dir_name
 
