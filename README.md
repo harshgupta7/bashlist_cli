@@ -13,5 +13,4 @@ Decentralized and trustless file storage and sharing.
 * `bls share <directory> <email_id>` -- share directory with email_id
 * `bls del <directory>` -- permanently delete a directory from your bashlist
 
-# Detailed Documentation
-* Coming Soon
+Server Side Code - https://github.com/harshgupta7/bashlist_backend
